@@ -6,6 +6,7 @@ module Hakyll.Shortcode.Parser (
   expandShortcodes
 ) where
 
+import Hakyll.Shortcode.Error
 import Text.ParserCombinators.Parsec
 import Text.Regex.Posix
 import Data.List.Utils (replace)
@@ -66,7 +67,12 @@ keyvalParser = do
 
 
 quotedString :: Parser String
-quotedString = singleQuotedString <|> doubleQuotedString
+quotedString = foldl1 (<|>)
+  [ singleQuotedString
+  , doubleQuotedString
+  , singleHandedQuotedString
+  , doubleHandedQuotedString
+  ]
   where
     singleQuotedString :: Parser String
     singleQuotedString = do
@@ -92,6 +98,30 @@ quotedString = singleQuotedString <|> doubleQuotedString
       _ <- char '"'
       return t
 
+    singleHandedQuotedString :: Parser String
+    singleHandedQuotedString = do
+      _ <- char '\x2018'
+      t <- many $ choice
+             [ try $ noneOf ['\\', '\x2019', '\n']
+             , try $ string "\\n"      >> return '\n'
+             , try $ string "\\\x2019" >> return '\x2019'
+             , try $ string "\\"       >> return '\\'
+             ]
+      _ <- char '\x2019'
+      return t
+
+    doubleHandedQuotedString :: Parser String
+    doubleHandedQuotedString = do
+      _ <- char '\x201C'
+      t <- many $ choice
+             [ try $ noneOf ['\\', '\x201D', '\n']
+             , try $ string "\\n"      >> return '\n'
+             , try $ string "\\\x201D" >> return '\x201D'
+             , try $ string "\\"       >> return '\\'
+             ]
+      _ <- char '\x201D'
+      return t
+
 
 
 {------------------------}
@@ -114,9 +144,12 @@ expandShortcodes x text = foldr (expandOne x) text matches
 
     getReplacement :: forall t. (Shortcode t) => t -> String -> String
     getReplacement x text = case runParser p () "" text of
-      Left error           -> "(shortcode error: " ++ show error
+      Left err             -> parseError (unTag theTag) $ show err
       Right (Left err)     -> err
       Right (Right result) -> embedcode result
       where
         p :: Parser (Either String t)
         p = shortcode
+
+        theTag :: ShortcodeTag t
+        theTag = tag

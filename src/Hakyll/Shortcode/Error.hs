@@ -19,3 +19,9 @@ validateError tag key badval expect = concat
   , "the value '" ++ badval ++ "' for key '" ++ key ++ "' is invalid. "
   , expect ++ ")"
   ]
+
+parseError :: String -> String -> String
+parseError tag err = concat
+  [ "(Nb. there was an error while parsing this '" ++ tag ++ "' tag. "
+  , err ++ ".)"
+  ]

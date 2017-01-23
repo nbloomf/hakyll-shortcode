@@ -179,8 +179,7 @@ instance Shortcode YouTubeEmbed where
   embedcode YouTubeEmbed{..} =
     let
       attributes = concat
-        [ showAttribute "class" yt_class
-        , " type='text/html'"
+        [ " type='text/html'"
         , showAttribute "height" yt_height
         , showAttribute "width" yt_width
         , " frameborder='0'"
@@ -203,8 +202,9 @@ instance Shortcode YouTubeEmbed where
       case yt_id of
         Nothing -> missingError "youtube" "id"
         Just yt_id' -> concat
-          [ "<iframe"
+          [ "<div" ++ showAttribute "class" yt_class ++ ">"
+          , "<iframe"
           , attributes
           , " src='https://www.youtube.com/embed/" ++ yt_id' ++ query_uri ++ "'"
-          , "></iframe>"
+          , "></iframe></div>"
           ]

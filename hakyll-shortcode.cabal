@@ -1,0 +1,19 @@
+Name:           hakyll-shortcode
+Version:        0.0.1
+Cabal-Version:  >= 1.2
+License:        GPL2
+Author:         Nathan Bloomfield
+Synopsis:       A shortcode extension module for Hakyll
+Stability:      Experimental
+Build-Type:     Simple
+
+Library
+  exposed-modules:
+    Hakyll.Shortcode,
+    Hakyll.Shortcode.Parser,
+    Hakyll.Shortcode.Error,
+    Hakyll.Shortcode.Validate,
+    Hakyll.Shortcode.Render,
+    Hakyll.Shortcode.Service.YouTube
+  hs-source-dirs: src/
+  build-depends:  base, regex-posix, MissingH, parsec
