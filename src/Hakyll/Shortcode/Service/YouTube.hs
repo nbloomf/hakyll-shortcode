@@ -27,12 +27,13 @@ import Text.Blaze.Html.Renderer.String (renderHtml)
 data YouTubeEmbed = YouTubeEmbed
   { yt_id       :: Maybe String
   , yt_class    :: Maybe String
-  , yt_height   :: Maybe String
-  , yt_width    :: Maybe String
+  , yt_height   :: Maybe String_DecimalDigits
+  , yt_width    :: Maybe String_DecimalDigits
   , yt_autoplay :: Maybe Autoplay
   , yt_captions :: Maybe CaptionPolicy
   , yt_related  :: Maybe ShowRelated
   , yt_controls :: Maybe ShowControls
+  , yt_color    :: Maybe Color
   } deriving Show
 
 
@@ -76,6 +77,16 @@ instance Render ShowRelated where
   render ShowRelatedNo  = "rel=0"
 
 
+data Color
+  = Red
+  | White
+  deriving (Eq, Show)
+
+instance Render Color where
+  render Red   = "color=red"
+  render White = "color=white"
+
+
 {----------------------}
 {- Shortcode Instance -}
 {----------------------}
@@ -83,6 +94,38 @@ instance Render ShowRelated where
 expandYouTubeShortcodes :: String -> String
 expandYouTubeShortcodes =
   expandShortcodes (emptycode :: YouTubeEmbed)
+
+
+embedUri :: YouTubeEmbed -> H.AttributeValue
+embedUri YouTubeEmbed{..} = H.stringValue $ uriToString show uri ""
+  where
+    uri = URI
+      { uriScheme = "https:"
+      , uriAuthority = Just $ URIAuth
+          { uriUserInfo = ""
+          , uriRegName  = "www.youtube.com"
+          , uriPort     = ""
+          }
+      , uriPath     = "/embed" ++ yt_id'
+      , uriQuery    = query
+      , uriFragment = ""
+      }
+
+    yt_id' = case yt_id of
+      Nothing -> ""
+      Just x  -> '/' : x
+
+    query =
+      let
+        str = queryCommaSep
+          [ renderMaybe yt_autoplay
+          , renderMaybe yt_captions
+          , renderMaybe yt_related
+          , renderMaybe yt_controls
+          , renderMaybe yt_color
+          ]
+      in
+        (if null str then "" else "?") ++ str
 
 
 instance Shortcode YouTubeEmbed where
@@ -109,22 +152,20 @@ instance Shortcode YouTubeEmbed where
             msgValidCSSClassName
 
     "height" -> do
-      if isDecimalDigits val
-        then do
-          let yt_height = Just val
+      case validate val of
+        Right x -> do
+          let yt_height = Just x
           return YouTubeEmbed{..}
-        else do
-          Left $ validateError "youtube" "height" val
-            msgDecimalDigits
+        Left msg -> do
+          Left $ validateError "youtube" "height" val msg
 
     "width" -> do
-      if isDecimalDigits val
-        then do
-          let yt_width = Just val
+      case validate val of
+        Right x -> do
+          let yt_width = Just x
           return YouTubeEmbed{..}
-        else do
-          Left $ validateError "youtube" "width" val
-            msgDecimalDigits
+        Left msg -> do
+          Left $ validateError "youtube" "width" val msg
 
     "autoplay" -> case val of
       "yes" -> do
@@ -169,6 +210,16 @@ instance Shortcode YouTubeEmbed where
       _ -> Left $ typeError "youtube" "show-related" val
              "Expected 'never', 'onload', or 'onplay'."
 
+    "color" -> case val of
+      "red" -> do
+        let yt_color = Just Red
+        return YouTubeEmbed{..}
+      "onload" -> do
+        let yt_color = Just White
+        return YouTubeEmbed{..}
+      _ -> Left $ typeError "youtube" "show-related" val
+             "Expected 'red' or 'white'."
+
     otherwise -> return YouTubeEmbed{..}
 
 
@@ -181,6 +232,7 @@ instance Shortcode YouTubeEmbed where
     , yt_captions = Nothing
     , yt_related  = Just ShowRelatedNo
     , yt_controls = Nothing
+    , yt_color    = Nothing
     }
 
 
@@ -194,33 +246,3 @@ instance Shortcode YouTubeEmbed where
           , A.type_ "text/html"
           , A.src $ embedUri yt
           ] $ mempty
-
-embedUri :: YouTubeEmbed -> H.AttributeValue
-embedUri YouTubeEmbed{..} = H.stringValue $ uriToString show uri ""
-  where
-    uri = URI
-      { uriScheme = "https:"
-      , uriAuthority = Just $ URIAuth
-          { uriUserInfo = ""
-          , uriRegName  = "www.youtube.com"
-          , uriPort     = ""
-          }
-      , uriPath     = "/embed" ++ yt_id'
-      , uriQuery    = query
-      , uriFragment = ""
-      }
-
-    yt_id' = case yt_id of
-      Nothing -> ""
-      Just x  -> '/' : x
-
-    query =
-      let
-        str = queryCommaSep
-          [ renderMaybe yt_autoplay
-          , renderMaybe yt_captions
-          , renderMaybe yt_related
-          , renderMaybe yt_controls
-          ]
-      in
-        (if null str then "" else "?") ++ str

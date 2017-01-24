@@ -1,6 +1,9 @@
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module Hakyll.Shortcode.Validate (
-  isDecimalDigits,
-  msgDecimalDigits,
+  validate,
+  String_DecimalDigits(),
   isAlphanumericHyphenUnderscore,
   msgAlphanumericHyphenUnderscore,
   isValidCSSClassName,
@@ -9,13 +12,25 @@ module Hakyll.Shortcode.Validate (
 
 import Text.Regex.Posix
 
-isDecimalDigits :: String -> Bool
-isDecimalDigits text =
-  text =~ "^[0-9]+$"
+-- The validate function acts like a safe constructor,
+-- allowing us to encode properties of strings as types.
 
-msgDecimalDigits :: String
-msgDecimalDigits =
-  "Must be one or more decimal digits (0-9)."
+class Validate t where
+  validate :: String -> Either String t
+
+
+
+{------------------}
+{- Decimal Digits -}
+{------------------}
+
+type String_DecimalDigits = String
+
+instance Validate String_DecimalDigits where
+  validate text = case text =~ "^[0-9]+$" of
+    True  -> Right text
+    False -> Left "Must be one or more decimal digits (0-9)."
+  
 
 isAlphanumericHyphenUnderscore :: String -> Bool
 isAlphanumericHyphenUnderscore text = 
