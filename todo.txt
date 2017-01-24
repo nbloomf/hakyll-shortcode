@@ -1,4 +1,3 @@
-* refactor quoted string, escape ]
 * account for escaped ] in shortcode regex
 * haddock
 * tests

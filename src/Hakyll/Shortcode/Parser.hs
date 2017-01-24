@@ -68,58 +68,23 @@ keyvalParser = do
 
 quotedString :: Parser String
 quotedString = foldl1 (<|>)
-  [ singleQuotedString
-  , doubleQuotedString
-  , singleHandedQuotedString
-  , doubleHandedQuotedString
+  [ delimitedString '\''     '\''
+  , delimitedString '"'      '"'
+  , delimitedString '\x2018' '\x2019' -- handed single quotes
+  , delimitedString '\x201C' '\x201D' -- handed double quotes
   ]
   where
-    singleQuotedString :: Parser String
-    singleQuotedString = do
-      _ <- char '\''
+    delimitedString :: Char -> Char -> Parser String
+    delimitedString open close = do
+      _ <- char open
       t <- many $ choice
-             [ try $ noneOf ['\\', '\'', '\n']
-             , try $ string "\\n"  >> return '\n'
-             , try $ string "\\'"  >> return '\''
-             , try $ string "\\"   >> return '\\'
+             [ try $ noneOf [ close, '\\', '\n', ']' ]
+             , try $ string ['\\',close] >> return close
+             , try $ string "\\"         >> return '\\'
+             , try $ string "\\n"        >> return '\n'
+             , try $ string "\\]"        >> return ']'
              ]
-      _ <- char '\''
-      return t  
-
-    doubleQuotedString :: Parser String
-    doubleQuotedString = do
-      _ <- char '"'
-      t <- many $ choice
-             [ try $ noneOf ['\\', '"', '\n']
-             , try $ string "\\n"  >> return '\n'
-             , try $ string "\\\"" >> return '"'
-             , try $ string "\\"   >> return '\\'
-             ]
-      _ <- char '"'
-      return t
-
-    singleHandedQuotedString :: Parser String
-    singleHandedQuotedString = do
-      _ <- char '\x2018'
-      t <- many $ choice
-             [ try $ noneOf ['\\', '\x2019', '\n']
-             , try $ string "\\n"      >> return '\n'
-             , try $ string "\\\x2019" >> return '\x2019'
-             , try $ string "\\"       >> return '\\'
-             ]
-      _ <- char '\x2019'
-      return t
-
-    doubleHandedQuotedString :: Parser String
-    doubleHandedQuotedString = do
-      _ <- char '\x201C'
-      t <- many $ choice
-             [ try $ noneOf ['\\', '\x201D', '\n']
-             , try $ string "\\n"      >> return '\n'
-             , try $ string "\\\x201D" >> return '\x201D'
-             , try $ string "\\"       >> return '\\'
-             ]
-      _ <- char '\x201D'
+      _ <- char close
       return t
 
 
