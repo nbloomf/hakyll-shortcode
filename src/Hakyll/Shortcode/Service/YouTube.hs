@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Hakyll.Shortcode.Service.YouTube (
@@ -8,7 +9,14 @@ import Hakyll.Shortcode.Parser
 import Hakyll.Shortcode.Error
 import Hakyll.Shortcode.Render
 import Hakyll.Shortcode.Validate
+import Hakyll.Shortcode.Html
+
+import Data.Monoid
 import Data.List (intercalate)
+import Network.URI
+import qualified Text.Blaze.Html5 as H
+import qualified Text.Blaze.Html5.Attributes as A
+import Text.Blaze.Html.Renderer.String (renderHtml)
 
 
 
@@ -166,45 +174,53 @@ instance Shortcode YouTubeEmbed where
 
   emptycode = YouTubeEmbed
     { yt_id       = Nothing
-    , yt_class    = Nothing
+    , yt_class    = Just "youtube-container"
     , yt_height   = Nothing
     , yt_width    = Nothing
     , yt_autoplay = Nothing
     , yt_captions = Nothing
-    , yt_related  = Nothing
+    , yt_related  = Just ShowRelatedNo
     , yt_controls = Nothing
     }
 
 
-  embedcode YouTubeEmbed{..} =
-    let
-      attributes = concat
-        [ " type='text/html'"
-        , showAttribute "height" yt_height
-        , showAttribute "width" yt_width
-        , " frameborder='0'"
-        ]
+  embedcode yt@YouTubeEmbed{..} = case yt_id of
+    Nothing -> missingError "youtube" "id"
+    Just yt_id' -> renderHtml $ do
+      H.div H.! (perhaps A.class_ yt_class) $ do
+        H.iframe H.! mconcat
+          [ perhaps A.height yt_height
+          , perhaps A.width yt_width
+          , A.type_ "text/html"
+          , A.src $ embedUri yt
+          ] $ mempty
 
-      query_uri =
-        let
-          fragment = intercalate "," $ filter (/= "")
-            [ renderMaybe yt_autoplay
-            , renderMaybe yt_captions
-            , renderMaybe yt_related
-            , renderMaybe yt_controls
-            ]
-        in
-          if fragment == ""
-            then ""
-            else '?' : fragment
+embedUri :: YouTubeEmbed -> H.AttributeValue
+embedUri YouTubeEmbed{..} = H.stringValue $ uriToString show uri ""
+  where
+    uri = URI
+      { uriScheme = "https:"
+      , uriAuthority = Just $ URIAuth
+          { uriUserInfo = ""
+          , uriRegName  = "www.youtube.com"
+          , uriPort     = ""
+          }
+      , uriPath     = "/embed" ++ yt_id'
+      , uriQuery    = query
+      , uriFragment = ""
+      }
 
-    in
-      case yt_id of
-        Nothing -> missingError "youtube" "id"
-        Just yt_id' -> concat
-          [ "<div" ++ showAttribute "class" yt_class ++ ">"
-          , "<iframe"
-          , attributes
-          , " src='https://www.youtube.com/embed/" ++ yt_id' ++ query_uri ++ "'"
-          , "></iframe></div>"
+    yt_id' = case yt_id of
+      Nothing -> ""
+      Just x  -> '/' : x
+
+    query =
+      let
+        str = queryCommaSep
+          [ renderMaybe yt_autoplay
+          , renderMaybe yt_captions
+          , renderMaybe yt_related
+          , renderMaybe yt_controls
           ]
+      in
+        (if null str then "" else "?") ++ str
