@@ -11,10 +11,10 @@ Library
   hs-source-dirs:
     src/
   exposed-modules:
-    Hakyll.Shortcode
+    Hakyll.Shortcode,
+    Hakyll.Shortcode.Service
   other-modules:
     Hakyll.Shortcode.Parser,
-    Hakyll.Shortcode.Error,
     Hakyll.Shortcode.Validate,
     Hakyll.Shortcode.Render,
     Hakyll.Shortcode.Html,

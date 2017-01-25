@@ -5,8 +5,8 @@ module Hakyll.Shortcode.Service.YouTube (
   expandYouTubeShortcodes
 ) where
 
-import Hakyll.Shortcode.Parser
-import Hakyll.Shortcode.Error
+
+import Hakyll.Shortcode.Service
 import Hakyll.Shortcode.Render
 import Hakyll.Shortcode.Validate
 import Hakyll.Shortcode.Html
@@ -60,7 +60,7 @@ data CaptionPolicy
   deriving (Eq, Show)
 
 instance Render CaptionPolicy where
-  render ShowCaptions    = "cc_load_policy=1"
+  render ShowCaptions = "cc_load_policy=1"
 
 
 {- controls -}
@@ -205,120 +205,41 @@ instance Shortcode YouTubeEmbed where
           ] $ mempty
 
 
-  update YouTubeEmbed{..} (key,val) = case key of
-    "id" -> case validate val of
-      Right x -> do
-        let yt_id = Just x
-        return YouTubeEmbed{..}
-      Left msg -> do
-        Left $ validateError "youtube" key val msg
+  attributes =
+    [ Valid "id"     $ \x yt -> yt { yt_id     = Just x }
+    , Valid "class"  $ \x yt -> yt { yt_class  = Just x }
+    , Valid "height" $ \x yt -> yt { yt_height = Just x }
+    , Valid "width"  $ \x yt -> yt { yt_width  = Just x }
+    , Valid "end"    $ \x yt -> yt { yt_end    = Just x }
+    , Valid "start"  $ \x yt -> yt { yt_start  = Just x }
 
-    "class" -> case validate val of
-      Right x -> do
-        let yt_class = Just x
-        return YouTubeEmbed{..}
-      Left msg -> do
-        Left $ validateError "youtube" key val msg
-
-    "height" -> case validate val of
-      Right x -> do
-        let yt_height = Just x
-        return YouTubeEmbed{..}
-      Left msg -> do
-        Left $ validateError "youtube" key val msg
-
-    "width" -> case validate val of
-      Right x -> do
-        let yt_width = Just x
-        return YouTubeEmbed{..}
-      Left msg -> do
-        Left $ validateError "youtube" key val msg
-
-    "autoplay" -> case val of
-      "yes" -> do
-        let yt_autoplay = Just AutoplayYes
-        return YouTubeEmbed{..}
-      "no" -> do
-        let yt_autoplay = Just AutoplayNo
-        return YouTubeEmbed{..}
-      _ -> Left $ typeError "youtube" key val
-             "Expected 'yes' or 'no'."
-
-    "captions" -> case val of
-      "show" -> do
-        let yt_captions = Just ShowCaptions
-        return YouTubeEmbed{..}
-      "default" -> do
-        let yt_captions = Nothing
-        return YouTubeEmbed{..}
-      _ -> Left $ typeError "youtube" key val
-             "Expected 'show' or 'default'."
-
-    "show-related" -> case val of
-      "yes" -> do
-        let yt_related = Just ShowRelatedYes
-        return YouTubeEmbed{..}
-      "no" -> do
-        let yt_related = Just ShowRelatedNo
-        return YouTubeEmbed{..}
-      _ -> Left $ typeError "youtube" key val
-             "Expected 'yes' or 'no'."
-
-    "show-controls" -> case val of
-      "never" -> do
-        let yt_controls = Just ShowControlsNever
-        return YouTubeEmbed{..}
-      "onload" -> do
-        let yt_controls = Just ShowControlsOnload
-        return YouTubeEmbed{..}
-      "onplay" -> do
-        let yt_controls = Just ShowControlsOnplay
-        return YouTubeEmbed{..}
-      _ -> Left $ typeError "youtube" key val
-             "Expected 'never', 'onload', or 'onplay'."
-
-    "color" -> case val of
-      "red" -> do
-        let yt_color = Just Red
-        return YouTubeEmbed{..}
-      "onload" -> do
-        let yt_color = Just White
-        return YouTubeEmbed{..}
-      _ -> Left $ typeError "youtube" key val
-             "Expected 'red' or 'white'."
-
-    "disable-keyboard" -> case val of
-      "yes" -> do
-        let yt_disablekb = Just DisableKeyboardYes
-        return YouTubeEmbed{..}
-      "no" -> do
-        let yt_disablekb = Just DisableKeyboardNo
-        return YouTubeEmbed{..}
-      _ -> Left $ typeError "youtube" key val
-             "Expected 'yes' or 'no'."
-
-    "end" -> case validate val of
-      Right x -> do
-        let yt_end = Just x
-        return YouTubeEmbed{..}
-      Left msg -> do
-        Left $ validateError "youtube" key val msg
-
-    "show-fullscreen" -> case val of
-      "yes" -> do
-        let yt_fullscreen = Just ShowFullscreenYes
-        return YouTubeEmbed{..}
-      "no" -> do
-        let yt_fullscreen = Just ShowFullscreenNo
-        return YouTubeEmbed{..}
-      _ -> Left $ typeError "youtube" key val
-             "Expected 'yes' or 'no'."
-
-    "start" -> case validate val of
-      Right x -> do
-        let yt_start = Just x
-        return YouTubeEmbed{..}
-      Left msg -> do
-        Left $ validateError "youtube" key val msg
-
-    otherwise -> return YouTubeEmbed{..}
+    , OneOf "autoplay"
+        [ ("yes", \yt -> yt { yt_autoplay = Just AutoplayYes })
+        , ("no",  \yt -> yt { yt_autoplay = Just AutoplayNo  })
+        ]
+    , OneOf "captions"
+        [ ("show",    \yt -> yt { yt_captions = Just ShowCaptions })
+        , ("default", \yt -> yt { yt_captions = Nothing           })
+        ]
+    , OneOf "show-related"
+        [ ("yes", \yt -> yt { yt_related = Just ShowRelatedYes })
+        , ("no",  \yt -> yt { yt_related = Just ShowRelatedNo  })
+        ]
+    , OneOf "show-controls"
+        [ ("never",  \yt -> yt { yt_controls = Just ShowControlsNever  })
+        , ("onload", \yt -> yt { yt_controls = Just ShowControlsOnload })
+        , ("onplay", \yt -> yt { yt_controls = Just ShowControlsOnplay })
+        ]
+    , OneOf "color"
+        [ ("red",   \yt -> yt { yt_color = Just Red   })
+        , ("white", \yt -> yt { yt_color = Just White })
+        ]
+    , OneOf "disable-keyboard"
+        [ ("yes", \yt -> yt { yt_disablekb = Just DisableKeyboardYes })
+        , ("no",  \yt -> yt { yt_disablekb = Just DisableKeyboardNo  })
+        ]
+    , OneOf "show-fullscreen"
+        [ ("yes", \yt -> yt { yt_fullscreen = Just ShowFullscreenYes })
+        , ("no",  \yt -> yt { yt_fullscreen = Just ShowFullscreenNo  })
+        ]
+    ]
