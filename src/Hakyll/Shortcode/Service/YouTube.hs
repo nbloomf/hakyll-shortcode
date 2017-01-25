@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 module Hakyll.Shortcode.Service.YouTube (
   expandYouTubeShortcodes
@@ -38,6 +38,7 @@ data YouTubeEmbed = YouTubeEmbed
   , yt_end        :: Maybe String_DecimalDigits
   , yt_fullscreen :: Maybe ShowFullscreen
   , yt_start      :: Maybe String_DecimalDigits
+  , yt_showlogo   :: Maybe ShowLogo
   } deriving Show
 
 
@@ -125,6 +126,18 @@ instance Render ShowFullscreen where
   render ShowFullscreenNo  = "fs=0"
 
 
+{- modestbranding -}
+
+data ShowLogo
+  = ShowLogoYes
+  | ShowLogoNo
+  deriving (Eq, Show)
+
+instance Render ShowLogo where
+  render ShowLogoYes = "modestbranding=0"
+  render ShowLogoNo  = "modestbranding=1"
+
+
 
 {----------------------}
 {- Shortcode Instance -}
@@ -165,6 +178,7 @@ embedUri YouTubeEmbed{..} = H.stringValue $ uriToString show uri ""
           , renderMaybe yt_color
           , renderMaybe yt_disablekb
           , renderMaybe yt_fullscreen
+          , renderMaybe yt_showlogo
           , renderKeyValMaybe "start" yt_start
           , renderKeyValMaybe "end"   yt_end
           ]
@@ -190,6 +204,7 @@ instance Shortcode YouTubeEmbed where
     , yt_fullscreen = Nothing
     , yt_related    = Just ShowRelatedNo
     , yt_start      = Nothing
+    , yt_showlogo   = Nothing
     }
 
 
@@ -241,5 +256,9 @@ instance Shortcode YouTubeEmbed where
     , OneOf "show-fullscreen"
         [ ("yes", \yt -> yt { yt_fullscreen = Just ShowFullscreenYes })
         , ("no",  \yt -> yt { yt_fullscreen = Just ShowFullscreenNo  })
+        ]
+    , OneOf "show-logo"
+        [ ("yes", \yt -> yt { yt_showlogo = Just ShowLogoYes })
+        , ("no",  \yt -> yt { yt_showlogo = Just ShowLogoNo  })
         ]
     ]
