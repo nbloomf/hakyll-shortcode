@@ -10,4 +10,13 @@ The module exports a function ``expandBLAHShortcodes`` for each shortcode type, 
 
 We try our best to validate input and sanitize the rendered HTML. But, at least for now, be very very careful before using this with untrusted input.
 
-At the moment, only the ``youtube`` shortcode is implemented, and not completely.
+# The Shortcodes
+
+## ``youtube``
+
+See the [API docs](https://developers.google.com/youtube/player_parameters).
+
+| Key       | Values | Description
+| --------- | ------ | -----------
+| ``id``    |        | (Required.) The id of the video to be embedded.
+| ``class`` |        | The resulting ``iframe`` is inside a ``div`` with this class. For CSS.
