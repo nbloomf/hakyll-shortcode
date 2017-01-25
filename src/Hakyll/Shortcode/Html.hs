@@ -6,11 +6,13 @@ import qualified Text.Blaze.Html5 as H
 import Text.Blaze.Renderer.String ()
 import Network.URI
 
+import Hakyll.Shortcode.Render
+
 
 -- 
-perhaps :: (Monoid a) => (H.AttributeValue -> a) -> Maybe String -> a
+perhaps :: (Monoid a, Render b) => (H.AttributeValue -> a) -> Maybe b -> a
 perhaps key Nothing  = mempty
-perhaps key (Just x) = key $ H.stringValue $ x
+perhaps key (Just x) = key $ H.stringValue $ render x
 
 
 -- Escape all reserved characters except '='.

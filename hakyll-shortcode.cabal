@@ -8,12 +8,22 @@ Stability:      Experimental
 Build-Type:     Simple
 
 Library
+  hs-source-dirs:
+    src/
   exposed-modules:
-    Hakyll.Shortcode,
+    Hakyll.Shortcode
+  other-modules:
     Hakyll.Shortcode.Parser,
     Hakyll.Shortcode.Error,
     Hakyll.Shortcode.Validate,
     Hakyll.Shortcode.Render,
+    Hakyll.Shortcode.Html,
     Hakyll.Shortcode.Service.YouTube
-  hs-source-dirs: src/
-  build-depends:  base, regex-posix, MissingH, parsec
+  build-depends:
+    base,
+    regex-posix,
+    MissingH,
+    blaze-html,
+    blaze-markup,
+    parsec,
+    network-uri
