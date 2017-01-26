@@ -43,6 +43,11 @@ data YouTubeEmbed = YouTubeEmbed
   , yt_playinline :: Maybe PlayInline
   , yt_playlist   :: Maybe String_AlphanumericHyphenUnderscoreComma
   , yt_showinfo   :: Maybe ShowInfo
+  , yt_showannot  :: Maybe ShowAnnotations
+  , yt_enablejs   :: Maybe EnableJSAPI
+  , yt_loop       :: Maybe Loop
+  , yt_origin     :: Maybe ()
+  , yt_listtype   :: Maybe ListType
   } deriving Show
 
 
@@ -166,6 +171,56 @@ instance Render ShowInfo where
   render ShowInfoNo  = "showinfo=0"
 
 
+{- iv_load_policy -}
+
+data ShowAnnotations
+  = ShowAnnotationsYes
+  | ShowAnnotationsNo
+  deriving (Eq, Show)
+
+instance Render ShowAnnotations where
+  render ShowAnnotationsYes = "iv_load_policy=1"
+  render ShowAnnotationsNo  = "iv_load_policy=3"
+
+
+{- enablejsapi -}
+
+data EnableJSAPI
+  = EnableJSAPIYes
+  | EnableJSAPINo
+  deriving (Eq, Show)
+
+instance Render EnableJSAPI where
+  render EnableJSAPIYes = "enablejsapi=1"
+  render EnableJSAPINo  = "enablejsapi=0"
+
+
+{- loop -}
+
+data Loop
+  = LoopYes
+  | LoopNo
+  deriving (Eq, Show)
+
+instance Render Loop where
+  render LoopYes = "loop=1"
+  render LoopNo  = "loop=0"
+
+
+{- listType -}
+
+data ListType
+  = ListTypePlaylist
+  | ListTypeSearch
+  | ListTypeUserUploads
+  deriving (Eq, Show)
+
+instance Render ListType where
+  render ListTypePlaylist    = "listType=playlist"
+  render ListTypeSearch      = "listType=search"
+  render ListTypeUserUploads = "listType=user_uploads"
+
+
 
 {----------------------}
 {- Shortcode Instance -}
@@ -209,6 +264,10 @@ embedUri YouTubeEmbed{..} = H.stringValue $ uriToString show uri ""
           , renderMaybe yt_showlogo
           , renderMaybe yt_playinline
           , renderMaybe yt_showinfo
+          , renderMaybe yt_showannot
+          , renderMaybe yt_enablejs
+          , renderMaybe yt_loop
+          , renderMaybe yt_listtype
           , renderKeyValMaybe "start"    yt_start
           , renderKeyValMaybe "end"      yt_end
           , renderKeyValMaybe "hl"       yt_language
@@ -241,19 +300,33 @@ instance Shortcode YouTubeEmbed where
     , yt_playinline = Nothing
     , yt_playlist   = Nothing
     , yt_showinfo   = Nothing
+    , yt_showannot  = Nothing
+    , yt_enablejs   = Nothing
+    , yt_loop       = Nothing
+    , yt_origin     = Nothing
+    , yt_listtype   = Nothing
     }
 
 
-  embedcode yt@YouTubeEmbed{..} = case yt_id of
-    Nothing -> missingError "youtube" "id"
-    Just yt_id' -> renderHtml $ do
-      H.div H.! (perhaps A.class_ yt_class) $ do
-        H.iframe H.! mconcat
-          [ perhaps A.height yt_height
-          , perhaps A.width yt_width
-          , A.type_ "text/html"
-          , A.src $ embedUri yt
-          ] $ mempty
+  embedcode yt@YouTubeEmbed{..}
+    {- check that 'origin' is set if 'enablejs' is 'yes' -}
+    | yt_enablejs /= Just EnableJSAPIYes && yt_origin == Nothing =
+        "(Warning: if you set 'enablejs' to 'yes', you should also set 'origin' to your domain.)"
+
+    {- id -}
+    | yt_id /= Nothing = do
+        let Just yt_id' = yt_id
+        renderHtml $ do
+          H.div H.! (perhaps A.class_ yt_class) $ do
+            H.iframe H.! mconcat
+              [ perhaps A.height yt_height
+              , perhaps A.width yt_width
+              , A.type_ "text/html"
+              , A.src $ embedUri yt
+              ] $ mempty
+
+    | otherwise =
+        "(Error: either the 'id' or the 'list' and 'list-type' parameter must be set.)"
 
 
   attributes =
@@ -300,5 +373,26 @@ instance Shortcode YouTubeEmbed where
     , OneOf "play-inline"
         [ ("yes", \yt -> yt { yt_playinline = Just PlayInlineYes })
         , ("no",  \yt -> yt { yt_playinline = Just PlayInlineNo  })
+        ]
+    , OneOf "show-info"
+        [ ("yes", \yt -> yt { yt_showinfo = Just ShowInfoYes })
+        , ("no",  \yt -> yt { yt_showinfo = Just ShowInfoNo  })
+        ]
+    , OneOf "show-annotations"
+        [ ("yes", \yt -> yt { yt_showannot = Just ShowAnnotationsYes })
+        , ("no",  \yt -> yt { yt_showannot = Just ShowAnnotationsNo  })
+        ]
+    , OneOf "enable-js-api"
+        [ ("yes", \yt -> yt { yt_enablejs = Just EnableJSAPIYes })
+        , ("no",  \yt -> yt { yt_enablejs = Just EnableJSAPINo  })
+        ]
+    , OneOf "loop"
+        [ ("yes", \yt -> yt { yt_loop = Just LoopYes })
+        , ("no",  \yt -> yt { yt_loop = Just LoopNo  })
+        ]
+    , OneOf "list-type"
+        [ ("playlist",     \yt -> yt { yt_listtype = Just ListTypePlaylist    })
+        , ("search",       \yt -> yt { yt_listtype = Just ListTypeSearch      })
+        , ("user-uploads", \yt -> yt { yt_listtype = Just ListTypeUserUploads })
         ]
     ]

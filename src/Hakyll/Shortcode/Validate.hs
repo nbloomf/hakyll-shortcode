@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances    #-}
 
 module Hakyll.Shortcode.Validate (
   Validate,
