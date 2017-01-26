@@ -20,3 +20,10 @@ queryCommaSep :: [String] -> String
 queryCommaSep = intercalate "," . filter (/= "") . map (escapeURIString encode)
   where
     encode c = not $ (isReserved c) && (c /= '=')
+
+
+-- Escape all reserved characters except '='.
+queryAmpSep :: [String] -> String
+queryAmpSep = intercalate "&" . filter (/= "") . map (escapeURIString encode)
+  where
+    encode c = not $ (isReserved c) && (c /= '=')

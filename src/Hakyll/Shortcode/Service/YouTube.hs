@@ -39,6 +39,10 @@ data YouTubeEmbed = YouTubeEmbed
   , yt_fullscreen :: Maybe ShowFullscreen
   , yt_start      :: Maybe String_DecimalDigits
   , yt_showlogo   :: Maybe ShowLogo
+  , yt_language   :: Maybe String_ISO_639_1
+  , yt_playinline :: Maybe PlayInline
+  , yt_playlist   :: Maybe String_AlphanumericHyphenUnderscoreComma
+  , yt_showinfo   :: Maybe ShowInfo
   } deriving Show
 
 
@@ -138,6 +142,30 @@ instance Render ShowLogo where
   render ShowLogoNo  = "modestbranding=1"
 
 
+{- playsinline -}
+
+data PlayInline
+  = PlayInlineYes
+  | PlayInlineNo
+  deriving (Eq, Show)
+
+instance Render PlayInline where
+  render PlayInlineYes = "playsinline=1"
+  render PlayInlineNo  = "playsinline=0"
+
+
+{- showinfo -}
+
+data ShowInfo
+  = ShowInfoYes
+  | ShowInfoNo
+  deriving (Eq, Show)
+
+instance Render ShowInfo where
+  render ShowInfoYes = "showinfo=1"
+  render ShowInfoNo  = "showinfo=0"
+
+
 
 {----------------------}
 {- Shortcode Instance -}
@@ -170,7 +198,7 @@ embedUri YouTubeEmbed{..} = H.stringValue $ uriToString show uri ""
 
     query =
       let
-        str = queryCommaSep
+        str = queryAmpSep
           [ renderMaybe yt_autoplay
           , renderMaybe yt_captions
           , renderMaybe yt_related
@@ -179,8 +207,12 @@ embedUri YouTubeEmbed{..} = H.stringValue $ uriToString show uri ""
           , renderMaybe yt_disablekb
           , renderMaybe yt_fullscreen
           , renderMaybe yt_showlogo
-          , renderKeyValMaybe "start" yt_start
-          , renderKeyValMaybe "end"   yt_end
+          , renderMaybe yt_playinline
+          , renderMaybe yt_showinfo
+          , renderKeyValMaybe "start"    yt_start
+          , renderKeyValMaybe "end"      yt_end
+          , renderKeyValMaybe "hl"       yt_language
+          , renderKeyValMaybe "playlist" yt_playlist
           ]
       in
         (if null str then "" else "?") ++ str
@@ -205,6 +237,10 @@ instance Shortcode YouTubeEmbed where
     , yt_related    = Just ShowRelatedNo
     , yt_start      = Nothing
     , yt_showlogo   = Nothing
+    , yt_language   = Nothing
+    , yt_playinline = Nothing
+    , yt_playlist   = Nothing
+    , yt_showinfo   = Nothing
     }
 
 
@@ -260,5 +296,9 @@ instance Shortcode YouTubeEmbed where
     , OneOf "show-logo"
         [ ("yes", \yt -> yt { yt_showlogo = Just ShowLogoYes })
         , ("no",  \yt -> yt { yt_showlogo = Just ShowLogoNo  })
+        ]
+    , OneOf "play-inline"
+        [ ("yes", \yt -> yt { yt_playinline = Just PlayInlineYes })
+        , ("no",  \yt -> yt { yt_playinline = Just PlayInlineNo  })
         ]
     ]
