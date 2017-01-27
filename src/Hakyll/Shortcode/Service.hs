@@ -5,13 +5,15 @@ module Hakyll.Shortcode.Service (
   Shortcode,
   tag, attributes, emptycode, embedcode,
   ShortcodeTag(ShortcodeTag),
-  ShortcodeAttribute(OneOf, Valid),
+  ShortcodeAttribute(YesNo, OneOf, Valid),
   expandShortcodes,
-  missingError
+  missingError,
+  YesNo(..)
 ) where
 
 import Hakyll.Shortcode.Validate
 import Hakyll.Shortcode.Parser
+import Hakyll.Shortcode.YesNo
 
 import Control.Monad (foldM)
 import Data.List (intercalate)
@@ -45,6 +47,9 @@ data ShortcodeTag a = ShortcodeTag
 
 
 data ShortcodeAttribute t where
+  -- The key string and a mutator.
+  YesNo :: String -> (YesNo -> t -> t) -> ShortcodeAttribute t
+
   -- The key string and a list of value/mutator pairs.
   OneOf :: String -> [(String, t -> t)] -> ShortcodeAttribute t
 
@@ -58,15 +63,18 @@ data ShortcodeAttribute t where
 update :: (Shortcode t) => t -> (String, String) -> Either String t
 update x kv = foldM (processKeyVal kv) x attributes
   where
-    processKeyVal :: forall t. (Shortcode t) => (String, String) -> t -> ShortcodeAttribute t -> Either String t
-    processKeyVal (k,v) x (Valid key f)
+    processKeyVal :: forall t. (Shortcode t)
+      => (String, String) -> t -> ShortcodeAttribute t -> Either String t
+
+    processKeyVal (k,v) x (YesNo key f)
       | key /= k  = Right x
-      | otherwise = case validate v of
-          Right z -> return $ f z x
-          Left er -> Left $ validateError (unTag theTag) k v er
-            where
-              theTag :: ShortcodeTag t
-              theTag = tag
+      | otherwise = case v of
+          "yes" -> Right $ f Yes x
+          "no"  -> Right $ f No  x
+          _     -> Left $ typeError (unTag theTag) key v ["\"yes\"", "\"no\""]
+          where
+            theTag :: ShortcodeTag t
+            theTag = tag
 
     processKeyVal (k,v) x (OneOf key cases)
       | key /= k  = Right x
@@ -79,6 +87,15 @@ update x kv = foldM (processKeyVal kv) x attributes
             
             theTag :: ShortcodeTag t
             theTag = tag
+
+    processKeyVal (k,v) x (Valid key f)
+      | key /= k  = Right x
+      | otherwise = case validate v of
+          Right z -> return $ f z x
+          Left er -> Left $ validateError (unTag theTag) k v er
+            where
+              theTag :: ShortcodeTag t
+              theTag = tag
 
 
 
@@ -115,7 +132,6 @@ expandShortcodes x text = foldr (expandOne x) text matches
 
         theTag :: ShortcodeTag t
         theTag = tag
-
 
 
 {----------}

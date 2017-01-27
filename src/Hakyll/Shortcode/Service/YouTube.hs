@@ -25,42 +25,35 @@ import Text.Blaze.Html.Renderer.String (renderHtml)
 {---------}
 
 data YouTubeEmbed = YouTubeEmbed
+  -- String Properties
   { yt_id         :: Maybe String_AlphanumericHyphenUnderscore
   , yt_class      :: Maybe String_CSSClassName
   , yt_height     :: Maybe String_DecimalDigits
   , yt_width      :: Maybe String_DecimalDigits
-  , yt_autoplay   :: Maybe Autoplay
-  , yt_captions   :: Maybe CaptionPolicy
-  , yt_related    :: Maybe ShowRelated
-  , yt_controls   :: Maybe ShowControls
-  , yt_color      :: Maybe Color
-  , yt_disablekb  :: Maybe DisableKeyboard
   , yt_end        :: Maybe String_DecimalDigits
-  , yt_fullscreen :: Maybe ShowFullscreen
   , yt_start      :: Maybe String_DecimalDigits
-  , yt_showlogo   :: Maybe ShowLogo
   , yt_language   :: Maybe String_ISO_639_1
-  , yt_playinline :: Maybe PlayInline
   , yt_playlist   :: Maybe String_AlphanumericHyphenUnderscoreComma
-  , yt_showinfo   :: Maybe ShowInfo
-  , yt_showannot  :: Maybe ShowAnnotations
-  , yt_enablejs   :: Maybe EnableJSAPI
-  , yt_loop       :: Maybe Loop
   , yt_origin     :: Maybe ()
+
+  -- Yes/No Properties
+  , yt_autoplay   :: Maybe YesNo
+  , yt_disablekb  :: Maybe YesNo
+  , yt_enablejs   :: Maybe YesNo
+  , yt_fullscreen :: Maybe YesNo
+  , yt_loop       :: Maybe YesNo
+  , yt_playinline :: Maybe YesNo
+  , yt_related    :: Maybe YesNo
+  , yt_showannot  :: Maybe YesNo
+  , yt_showinfo   :: Maybe YesNo
+  , yt_showlogo   :: Maybe YesNo
+
+  -- Enumerated Properties
+  , yt_captions   :: Maybe CaptionPolicy
+  , yt_color      :: Maybe Color
+  , yt_controls   :: Maybe ShowControls
   , yt_listtype   :: Maybe ListType
   } deriving Show
-
-
-{- autoplay -}
-
-data Autoplay
-  = AutoplayYes
-  | AutoplayNo
-  deriving (Eq, Show)
-
-instance Render Autoplay where
-  render AutoplayYes = "autoplay=1"
-  render AutoplayNo  = "autoplay=0"
 
 
 {- cc_load_policy -}
@@ -87,18 +80,6 @@ instance Render ShowControls where
   render ShowControlsOnplay = "controls=2"
 
 
-{- rel -}
-
-data ShowRelated
-  = ShowRelatedYes
-  | ShowRelatedNo
-  deriving (Eq, Show)
-
-instance Render ShowRelated where
-  render ShowRelatedYes = "rel=1"
-  render ShowRelatedNo  = "rel=0"
-
-
 {- color -}
 
 data Color
@@ -109,102 +90,6 @@ data Color
 instance Render Color where
   render Red   = "color=red"
   render White = "color=white"
-
-
-{- disablekb -}
-
-data DisableKeyboard
-  = DisableKeyboardYes
-  | DisableKeyboardNo
-  deriving (Eq, Show)
-
-instance Render DisableKeyboard where
-  render DisableKeyboardYes = "disablekb=1"
-  render DisableKeyboardNo  = "disablekb=0"
-
-
-{- fs -}
-
-data ShowFullscreen
-  = ShowFullscreenYes
-  | ShowFullscreenNo
-  deriving (Eq, Show)
-
-instance Render ShowFullscreen where
-  render ShowFullscreenYes = "fs=1"
-  render ShowFullscreenNo  = "fs=0"
-
-
-{- modestbranding -}
-
-data ShowLogo
-  = ShowLogoYes
-  | ShowLogoNo
-  deriving (Eq, Show)
-
-instance Render ShowLogo where
-  render ShowLogoYes = "modestbranding=0"
-  render ShowLogoNo  = "modestbranding=1"
-
-
-{- playsinline -}
-
-data PlayInline
-  = PlayInlineYes
-  | PlayInlineNo
-  deriving (Eq, Show)
-
-instance Render PlayInline where
-  render PlayInlineYes = "playsinline=1"
-  render PlayInlineNo  = "playsinline=0"
-
-
-{- showinfo -}
-
-data ShowInfo
-  = ShowInfoYes
-  | ShowInfoNo
-  deriving (Eq, Show)
-
-instance Render ShowInfo where
-  render ShowInfoYes = "showinfo=1"
-  render ShowInfoNo  = "showinfo=0"
-
-
-{- iv_load_policy -}
-
-data ShowAnnotations
-  = ShowAnnotationsYes
-  | ShowAnnotationsNo
-  deriving (Eq, Show)
-
-instance Render ShowAnnotations where
-  render ShowAnnotationsYes = "iv_load_policy=1"
-  render ShowAnnotationsNo  = "iv_load_policy=3"
-
-
-{- enablejsapi -}
-
-data EnableJSAPI
-  = EnableJSAPIYes
-  | EnableJSAPINo
-  deriving (Eq, Show)
-
-instance Render EnableJSAPI where
-  render EnableJSAPIYes = "enablejsapi=1"
-  render EnableJSAPINo  = "enablejsapi=0"
-
-
-{- loop -}
-
-data Loop
-  = LoopYes
-  | LoopNo
-  deriving (Eq, Show)
-
-instance Render Loop where
-  render LoopYes = "loop=1"
-  render LoopNo  = "loop=0"
 
 
 {- listType -}
@@ -254,19 +139,19 @@ embedUri YouTubeEmbed{..} = H.stringValue $ uriToString show uri ""
     query =
       let
         str = queryAmpSep
-          [ renderMaybe yt_autoplay
+          [ ifYesNo yt_autoplay   "autoplay=1"       "autoplay=0"
+          , ifYesNo yt_disablekb  "disablekb=1"      "disablekb=0"
+          , ifYesNo yt_enablejs   "enablejsapi=1"    "enablejsapi=0"
+          , ifYesNo yt_fullscreen "fs=1"             "fs=0"
+          , ifYesNo yt_loop       "loop=1"           "loop=0"
+          , ifYesNo yt_playinline "playsinline=1"    "playsinline=0"
+          , ifYesNo yt_related    "rel=1"            "rel=0"
+          , ifYesNo yt_showannot  "iv_load_policy=1" "iv_load_policy=3"
+          , ifYesNo yt_showinfo   "showinfo=1"       "showinfo=0"
+          , ifYesNo yt_showlogo   "modestbranding=0" "modestbranding=1"
           , renderMaybe yt_captions
-          , renderMaybe yt_related
           , renderMaybe yt_controls
           , renderMaybe yt_color
-          , renderMaybe yt_disablekb
-          , renderMaybe yt_fullscreen
-          , renderMaybe yt_showlogo
-          , renderMaybe yt_playinline
-          , renderMaybe yt_showinfo
-          , renderMaybe yt_showannot
-          , renderMaybe yt_enablejs
-          , renderMaybe yt_loop
           , renderMaybe yt_listtype
           , renderKeyValMaybe "start"    yt_start
           , renderKeyValMaybe "end"      yt_end
@@ -293,7 +178,7 @@ instance Shortcode YouTubeEmbed where
     , yt_disablekb  = Nothing
     , yt_end        = Nothing
     , yt_fullscreen = Nothing
-    , yt_related    = Just ShowRelatedNo
+    , yt_related    = Just No
     , yt_start      = Nothing
     , yt_showlogo   = Nothing
     , yt_language   = Nothing
@@ -310,12 +195,11 @@ instance Shortcode YouTubeEmbed where
 
   embedcode yt@YouTubeEmbed{..}
     {- check that 'origin' is set if 'enablejs' is 'yes' -}
-    | yt_enablejs /= Just EnableJSAPIYes && yt_origin == Nothing =
+    | yt_enablejs == Just Yes && yt_origin /= Nothing =
         "(Warning: if you set 'enablejs' to 'yes', you should also set 'origin' to your domain.)"
 
     {- id -}
     | yt_id /= Nothing = do
-        let Just yt_id' = yt_id
         renderHtml $ do
           H.div H.! (perhaps A.class_ yt_class) $ do
             H.iframe H.! mconcat
@@ -330,6 +214,7 @@ instance Shortcode YouTubeEmbed where
 
 
   attributes =
+    -- String Properties
     [ Valid "id"     $ \x yt -> yt { yt_id     = Just x }
     , Valid "class"  $ \x yt -> yt { yt_class  = Just x }
     , Valid "height" $ \x yt -> yt { yt_height = Just x }
@@ -337,17 +222,22 @@ instance Shortcode YouTubeEmbed where
     , Valid "end"    $ \x yt -> yt { yt_end    = Just x }
     , Valid "start"  $ \x yt -> yt { yt_start  = Just x }
 
-    , OneOf "autoplay"
-        [ ("yes", \yt -> yt { yt_autoplay = Just AutoplayYes })
-        , ("no",  \yt -> yt { yt_autoplay = Just AutoplayNo  })
-        ]
+    -- Yes/No Properties
+    , YesNo "loop"             $ \x yt -> yt { yt_loop       = Just x }
+    , YesNo "show-related"     $ \x yt -> yt { yt_related    = Just x }
+    , YesNo "disable-keyboard" $ \x yt -> yt { yt_disablekb  = Just x }
+    , YesNo "autoplay"         $ \x yt -> yt { yt_autoplay   = Just x }
+    , YesNo "show-fullscreen"  $ \x yt -> yt { yt_fullscreen = Just x }
+    , YesNo "show-info"        $ \x yt -> yt { yt_showinfo   = Just x }
+    , YesNo "play-inline"      $ \x yt -> yt { yt_playinline = Just x }
+    , YesNo "show-logo"        $ \x yt -> yt { yt_showlogo   = Just x }
+    , YesNo "show-annotations" $ \x yt -> yt { yt_showannot  = Just x }
+    , YesNo "enable-js-api"    $ \x yt -> yt { yt_enablejs   = Just x }
+
+    -- Enumerated Properties
     , OneOf "captions"
         [ ("show",    \yt -> yt { yt_captions = Just ShowCaptions })
         , ("default", \yt -> yt { yt_captions = Nothing           })
-        ]
-    , OneOf "show-related"
-        [ ("yes", \yt -> yt { yt_related = Just ShowRelatedYes })
-        , ("no",  \yt -> yt { yt_related = Just ShowRelatedNo  })
         ]
     , OneOf "show-controls"
         [ ("never",  \yt -> yt { yt_controls = Just ShowControlsNever  })
@@ -357,38 +247,6 @@ instance Shortcode YouTubeEmbed where
     , OneOf "color"
         [ ("red",   \yt -> yt { yt_color = Just Red   })
         , ("white", \yt -> yt { yt_color = Just White })
-        ]
-    , OneOf "disable-keyboard"
-        [ ("yes", \yt -> yt { yt_disablekb = Just DisableKeyboardYes })
-        , ("no",  \yt -> yt { yt_disablekb = Just DisableKeyboardNo  })
-        ]
-    , OneOf "show-fullscreen"
-        [ ("yes", \yt -> yt { yt_fullscreen = Just ShowFullscreenYes })
-        , ("no",  \yt -> yt { yt_fullscreen = Just ShowFullscreenNo  })
-        ]
-    , OneOf "show-logo"
-        [ ("yes", \yt -> yt { yt_showlogo = Just ShowLogoYes })
-        , ("no",  \yt -> yt { yt_showlogo = Just ShowLogoNo  })
-        ]
-    , OneOf "play-inline"
-        [ ("yes", \yt -> yt { yt_playinline = Just PlayInlineYes })
-        , ("no",  \yt -> yt { yt_playinline = Just PlayInlineNo  })
-        ]
-    , OneOf "show-info"
-        [ ("yes", \yt -> yt { yt_showinfo = Just ShowInfoYes })
-        , ("no",  \yt -> yt { yt_showinfo = Just ShowInfoNo  })
-        ]
-    , OneOf "show-annotations"
-        [ ("yes", \yt -> yt { yt_showannot = Just ShowAnnotationsYes })
-        , ("no",  \yt -> yt { yt_showannot = Just ShowAnnotationsNo  })
-        ]
-    , OneOf "enable-js-api"
-        [ ("yes", \yt -> yt { yt_enablejs = Just EnableJSAPIYes })
-        , ("no",  \yt -> yt { yt_enablejs = Just EnableJSAPINo  })
-        ]
-    , OneOf "loop"
-        [ ("yes", \yt -> yt { yt_loop = Just LoopYes })
-        , ("no",  \yt -> yt { yt_loop = Just LoopNo  })
         ]
     , OneOf "list-type"
         [ ("playlist",     \yt -> yt { yt_listtype = Just ListTypePlaylist    })
