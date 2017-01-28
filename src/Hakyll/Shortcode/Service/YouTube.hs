@@ -11,7 +11,6 @@ import Hakyll.Shortcode.Render
 import Hakyll.Shortcode.Types
 
 import Data.Monoid
-import Data.List (intercalate)
 import Network.URI
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
@@ -190,7 +189,7 @@ instance Shortcode YouTubeEmbed where
         "(Warning: if you set 'enablejs' to 'yes', you should also set 'origin' to your domain.)"
 
     {- id -}
-    | yt_id /= Nothing = do
+    | yt_id /= Nothing || (yt_playlist /= Nothing && yt_listtype /= Nothing) = do
         renderHtml $ do
           H.div H.! (attrValid A.class_ yt_class) $ do
             H.iframe H.! mconcat
@@ -206,12 +205,13 @@ instance Shortcode YouTubeEmbed where
 
   attributes =
     -- String Properties
-    [ Valid "id"     $ \x yt -> yt { yt_id     = Just x }
-    , Valid "class"  $ \x yt -> yt { yt_class  = Just x }
-    , Valid "height" $ \x yt -> yt { yt_height = Just x }
-    , Valid "width"  $ \x yt -> yt { yt_width  = Just x }
-    , Valid "end"    $ \x yt -> yt { yt_end    = Just x }
-    , Valid "start"  $ \x yt -> yt { yt_start  = Just x }
+    [ Valid "id"     $ \x yt -> yt { yt_id       = Just x }
+    , Valid "class"  $ \x yt -> yt { yt_class    = Just x }
+    , Valid "height" $ \x yt -> yt { yt_height   = Just x }
+    , Valid "width"  $ \x yt -> yt { yt_width    = Just x }
+    , Valid "end"    $ \x yt -> yt { yt_end      = Just x }
+    , Valid "start"  $ \x yt -> yt { yt_start    = Just x }
+    , Valid "list"   $ \x yt -> yt { yt_playlist = Just x }
 
     -- Yes/No Properties
     , YesNo "loop"             $ \x yt -> yt { yt_loop       = Just x }
