@@ -2,6 +2,8 @@ module Hakyll.Shortcode.Types (
   module Hakyll.Shortcode.Validate,
 
   module Hakyll.Shortcode.Types.Css_Class_Name,
+  module Hakyll.Shortcode.Types.Domain_With_Scheme,
+  module Hakyll.Shortcode.Types.Hex_Color_Code,
   module Hakyll.Shortcode.Types.Iso_639_1_Language_Code,
   module Hakyll.Shortcode.Types.Letters_Numbers,
   module Hakyll.Shortcode.Types.Letters_Numbers_Hyphens_Underscores,
@@ -15,6 +17,8 @@ module Hakyll.Shortcode.Types (
 import Hakyll.Shortcode.Validate
 
 import Hakyll.Shortcode.Types.Css_Class_Name
+import Hakyll.Shortcode.Types.Domain_With_Scheme
+import Hakyll.Shortcode.Types.Hex_Color_Code
 import Hakyll.Shortcode.Types.Iso_639_1_Language_Code
 import Hakyll.Shortcode.Types.Letters_Numbers
 import Hakyll.Shortcode.Types.Letters_Numbers_Hyphens_Underscores

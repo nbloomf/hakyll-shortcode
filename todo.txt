@@ -1,4 +1,4 @@
 * account for escaped ] in shortcode regex
 * haddock
 * tests
-* finish YouTube parameters
+* finish "origin" and "list" YouTube parameters

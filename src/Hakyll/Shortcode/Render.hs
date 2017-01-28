@@ -7,6 +7,9 @@ module Hakyll.Shortcode.Render (
   queryYesNo,
 
   pathValid,
+  pathYesNo,
+  pathValidPre,
+  pathYesNoPre,
   
   attrValid
 ) where
@@ -95,6 +98,22 @@ buildPath = concatMap ('/':) . filter (/= "") . map sanitizePath
 pathValid :: (Show t) => Maybe t -> String
 pathValid Nothing  = ""
 pathValid (Just x) = show x
+
+pathValidPre :: (Show t) => String -> Maybe t -> [String]
+pathValidPre _ Nothing  = []
+pathValidPre p (Just x) = [p, show x]
+
+pathYesNo :: Maybe YesNo -> String -> String -> String
+pathYesNo x yes no = case x of
+  Nothing  -> ""
+  Just Yes -> yes
+  Just No  -> no
+
+pathYesNoPre :: String -> Maybe YesNo -> String -> String -> [String]
+pathYesNoPre p x yes no = case x of
+  Nothing  -> []
+  Just Yes -> [p,yes]
+  Just No  -> [p,no]
 
 
 {--------------}

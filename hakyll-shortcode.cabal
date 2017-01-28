@@ -18,9 +18,13 @@ Library
     Hakyll.Shortcode.Validate,
     Hakyll.Shortcode.Render,
     Hakyll.Shortcode.Service.YouTube,
+    Hakyll.Shortcode.Service.GeoGebra,
     Hakyll.Shortcode.Types.CommaSep,
     Hakyll.Shortcode.Types.Css_Class_Name,
+    Hakyll.Shortcode.Types.Domain_With_Scheme,
+    Hakyll.Shortcode.Types.Hex_Color_Code,
     Hakyll.Shortcode.Types.Iso_639_1_Language_Code,
+    Hakyll.Shortcode.Types.Letters_Numbers,
     Hakyll.Shortcode.Types.Letters_Numbers_Hyphens_Underscores,
     Hakyll.Shortcode.Types.Natural_Number_Base_10,
     Hakyll.Shortcode.Types.YesNo
@@ -33,3 +37,20 @@ Library
     parsec,
     network-uri,
     split
+
+Test-Suite hakyll-shortcode-test-suite
+  type:
+    exitcode-stdio-1.0
+  main-is:
+    Tests/Main.hs
+  hs-source-dirs:
+    test/,
+    src/
+  ghc-options:
+    -main-is Tests.Main
+    -fforce-recomp
+  build-depends:
+    base,
+    QuickCheck,
+    tasty,
+    tasty-quickcheck

@@ -32,7 +32,7 @@ data YouTubeEmbed = YouTubeEmbed
   , yt_start      :: Maybe Natural_Number_Base_10
   , yt_language   :: Maybe Iso_639_1_Language_Code
   , yt_playlist   :: Maybe (CommaSep Letters_Numbers_Hyphens_Underscores)
-  , yt_origin     :: Maybe ()
+  , yt_origin     :: Maybe Domain_With_Scheme
 
   -- Yes/No Properties
   , yt_autoplay   :: Maybe YesNo
@@ -130,6 +130,7 @@ embedUri YouTubeEmbed{..} = H.stringValue
       , queryValid yt_end      "end"
       , queryValid yt_language "hl"
       , queryValid yt_playlist "playlist"
+      , queryValid yt_origin   "origin"
 
       -- Yes/No Properties
       , queryYesNo yt_autoplay   "autoplay=1"       "autoplay=0"
@@ -188,7 +189,7 @@ instance Shortcode YouTubeEmbed where
     | yt_enablejs == Just Yes && yt_origin /= Nothing =
         "(Warning: if you set 'enablejs' to 'yes', you should also set 'origin' to your domain.)"
 
-    {- id -}
+    {- id or list+listType -}
     | yt_id /= Nothing || (yt_playlist /= Nothing && yt_listtype /= Nothing) = do
         renderHtml $ do
           H.div H.! (attrValid A.class_ yt_class) $ do
@@ -212,6 +213,7 @@ instance Shortcode YouTubeEmbed where
     , Valid "end"    $ \x yt -> yt { yt_end      = Just x }
     , Valid "start"  $ \x yt -> yt { yt_start    = Just x }
     , Valid "list"   $ \x yt -> yt { yt_playlist = Just x }
+    , Valid "origin" $ \x yt -> yt { yt_origin   = Just x }
 
     -- Yes/No Properties
     , YesNo "loop"             $ \x yt -> yt { yt_loop       = Just x }

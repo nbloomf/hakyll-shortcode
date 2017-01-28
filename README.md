@@ -26,6 +26,7 @@ See the [API docs](https://developers.google.com/youtube/player_parameters).
 | ``width``            |                       | Width of the ``iframe``.
 | ``start``            | A counting number     | Start time, in seconds, from the beginning.
 | ``end``              | A counting number     | 
+| ``origin``           |                       | The domain+scheme where the iframe is embedded
 | ``list``             |                       | Comma separated list of video IDs
 | ``autoplay``         | ``yes``, (``no``)     | If yes, automatically start after loading.
 | ``show-related``     | ``yes``, (``no``)     | If yes, show related videos at the end.
