@@ -17,8 +17,13 @@ Library
     Hakyll.Shortcode.Parser,
     Hakyll.Shortcode.Validate,
     Hakyll.Shortcode.Render,
-    Hakyll.Shortcode.Html,
-    Hakyll.Shortcode.Service.YouTube
+    Hakyll.Shortcode.Service.YouTube,
+    Hakyll.Shortcode.Types.CommaSep,
+    Hakyll.Shortcode.Types.Css_Class_Name,
+    Hakyll.Shortcode.Types.Iso_639_1_Language_Code,
+    Hakyll.Shortcode.Types.Letters_Numbers_Hyphens_Underscores,
+    Hakyll.Shortcode.Types.Natural_Number_Base_10,
+    Hakyll.Shortcode.Types.YesNo
   build-depends:
     base,
     regex-posix,
@@ -26,4 +31,5 @@ Library
     blaze-html,
     blaze-markup,
     parsec,
-    network-uri
+    network-uri,
+    split

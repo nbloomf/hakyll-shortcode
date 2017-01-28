@@ -8,8 +8,7 @@ module Hakyll.Shortcode.Service.YouTube (
 
 import Hakyll.Shortcode.Service
 import Hakyll.Shortcode.Render
-import Hakyll.Shortcode.Validate
-import Hakyll.Shortcode.Html
+import Hakyll.Shortcode.Types
 
 import Data.Monoid
 import Data.List (intercalate)
@@ -26,14 +25,14 @@ import Text.Blaze.Html.Renderer.String (renderHtml)
 
 data YouTubeEmbed = YouTubeEmbed
   -- String Properties
-  { yt_id         :: Maybe String_AlphanumericHyphenUnderscore
-  , yt_class      :: Maybe String_CSSClassName
-  , yt_height     :: Maybe String_DecimalDigits
-  , yt_width      :: Maybe String_DecimalDigits
-  , yt_end        :: Maybe String_DecimalDigits
-  , yt_start      :: Maybe String_DecimalDigits
-  , yt_language   :: Maybe String_ISO_639_1
-  , yt_playlist   :: Maybe String_AlphanumericHyphenUnderscoreComma
+  { yt_id         :: Maybe Letters_Numbers_Hyphens_Underscores
+  , yt_class      :: Maybe Css_Class_Name
+  , yt_height     :: Maybe Natural_Number_Base_10
+  , yt_width      :: Maybe Natural_Number_Base_10
+  , yt_end        :: Maybe Natural_Number_Base_10
+  , yt_start      :: Maybe Natural_Number_Base_10
+  , yt_language   :: Maybe Iso_639_1_Language_Code
+  , yt_playlist   :: Maybe (CommaSep Letters_Numbers_Hyphens_Underscores)
   , yt_origin     :: Maybe ()
 
   -- Yes/No Properties
@@ -60,10 +59,10 @@ data YouTubeEmbed = YouTubeEmbed
 
 data CaptionPolicy
   = ShowCaptions
-  deriving (Eq, Show)
+  deriving Eq
 
-instance Render CaptionPolicy where
-  render ShowCaptions = "cc_load_policy=1"
+instance Show CaptionPolicy where
+  show ShowCaptions = "cc_load_policy=1"
 
 
 {- controls -}
@@ -72,12 +71,12 @@ data ShowControls
   = ShowControlsNever
   | ShowControlsOnload
   | ShowControlsOnplay
-  deriving (Eq, Show)
+  deriving Eq
 
-instance Render ShowControls where
-  render ShowControlsNever  = "controls=0"
-  render ShowControlsOnload = "controls=1"
-  render ShowControlsOnplay = "controls=2"
+instance Show ShowControls where
+  show ShowControlsNever  = "controls=0"
+  show ShowControlsOnload = "controls=1"
+  show ShowControlsOnplay = "controls=2"
 
 
 {- color -}
@@ -85,11 +84,11 @@ instance Render ShowControls where
 data Color
   = Red
   | White
-  deriving (Eq, Show)
+  deriving Eq
 
-instance Render Color where
-  render Red   = "color=red"
-  render White = "color=white"
+instance Show Color where
+  show Red   = "color=red"
+  show White = "color=white"
 
 
 {- listType -}
@@ -98,12 +97,12 @@ data ListType
   = ListTypePlaylist
   | ListTypeSearch
   | ListTypeUserUploads
-  deriving (Eq, Show)
+  deriving Eq
 
-instance Render ListType where
-  render ListTypePlaylist    = "listType=playlist"
-  render ListTypeSearch      = "listType=search"
-  render ListTypeUserUploads = "listType=user_uploads"
+instance Show ListType where
+  show ListTypePlaylist    = "listType=playlist"
+  show ListTypeSearch      = "listType=search"
+  show ListTypeUserUploads = "listType=user_uploads"
 
 
 
@@ -118,48 +117,40 @@ expandYouTubeShortcodes =
 
 -- Constructs the embed URI of a YouTubeEmbed.
 embedUri :: YouTubeEmbed -> H.AttributeValue
-embedUri YouTubeEmbed{..} = H.stringValue $ uriToString show uri ""
+embedUri YouTubeEmbed{..} = H.stringValue
+  $ buildURL HTTPS "www.youtube.com" path query []
   where
-    uri = URI
-      { uriScheme = "https:"
-      , uriAuthority = Just $ URIAuth
-          { uriUserInfo = ""
-          , uriRegName  = "www.youtube.com"
-          , uriPort     = ""
-          }
-      , uriPath     = "/embed" ++ yt_id'
-      , uriQuery    = query
-      , uriFragment = ""
-      }
-
-    yt_id' = case yt_id of
-      Nothing -> ""
-      Just x  -> '/' : render x
+    path =
+      [ "embed"
+      , pathValid yt_id
+      ]
 
     query =
-      let
-        str = queryAmpSep
-          [ ifYesNo yt_autoplay   "autoplay=1"       "autoplay=0"
-          , ifYesNo yt_disablekb  "disablekb=1"      "disablekb=0"
-          , ifYesNo yt_enablejs   "enablejsapi=1"    "enablejsapi=0"
-          , ifYesNo yt_fullscreen "fs=1"             "fs=0"
-          , ifYesNo yt_loop       "loop=1"           "loop=0"
-          , ifYesNo yt_playinline "playsinline=1"    "playsinline=0"
-          , ifYesNo yt_related    "rel=1"            "rel=0"
-          , ifYesNo yt_showannot  "iv_load_policy=1" "iv_load_policy=3"
-          , ifYesNo yt_showinfo   "showinfo=1"       "showinfo=0"
-          , ifYesNo yt_showlogo   "modestbranding=0" "modestbranding=1"
-          , renderMaybe yt_captions
-          , renderMaybe yt_controls
-          , renderMaybe yt_color
-          , renderMaybe yt_listtype
-          , renderKeyValMaybe "start"    yt_start
-          , renderKeyValMaybe "end"      yt_end
-          , renderKeyValMaybe "hl"       yt_language
-          , renderKeyValMaybe "playlist" yt_playlist
-          ]
-      in
-        (if null str then "" else "?") ++ str
+      -- String Properties
+      [ queryValid yt_start    "start"
+      , queryValid yt_end      "end"
+      , queryValid yt_language "hl"
+      , queryValid yt_playlist "playlist"
+
+      -- Yes/No Properties
+      , queryYesNo yt_autoplay   "autoplay=1"       "autoplay=0"
+      , queryYesNo yt_disablekb  "disablekb=1"      "disablekb=0"
+      , queryYesNo yt_enablejs   "enablejsapi=1"    "enablejsapi=0"
+      , queryYesNo yt_fullscreen "fs=1"             "fs=0"
+      , queryYesNo yt_loop       "loop=1"           "loop=0"
+      , queryYesNo yt_playinline "playsinline=1"    "playsinline=0"
+      , queryYesNo yt_related    "rel=1"            "rel=0"
+      , queryYesNo yt_showannot  "iv_load_policy=1" "iv_load_policy=3"
+      , queryYesNo yt_showinfo   "showinfo=1"       "showinfo=0"
+      , queryYesNo yt_showlogo   "modestbranding=0" "modestbranding=1"
+
+      -- Enumerated Properties
+      , queryOneOf yt_captions
+      , queryOneOf yt_color
+      , queryOneOf yt_controls
+      , queryOneOf yt_listtype
+      ]
+
 
 
 instance Shortcode YouTubeEmbed where
@@ -201,10 +192,10 @@ instance Shortcode YouTubeEmbed where
     {- id -}
     | yt_id /= Nothing = do
         renderHtml $ do
-          H.div H.! (perhaps A.class_ yt_class) $ do
+          H.div H.! (attrValid A.class_ yt_class) $ do
             H.iframe H.! mconcat
-              [ perhaps A.height yt_height
-              , perhaps A.width yt_width
+              [ attrValid A.height yt_height
+              , attrValid A.width yt_width
               , A.type_ "text/html"
               , A.src $ embedUri yt
               ] $ mempty

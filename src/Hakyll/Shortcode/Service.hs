@@ -13,7 +13,7 @@ module Hakyll.Shortcode.Service (
 
 import Hakyll.Shortcode.Validate
 import Hakyll.Shortcode.Parser
-import Hakyll.Shortcode.YesNo
+import Hakyll.Shortcode.Types.YesNo
 
 import Control.Monad (foldM)
 import Data.List (intercalate)

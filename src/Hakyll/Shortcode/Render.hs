@@ -1,20 +1,107 @@
-module Hakyll.Shortcode.Render where
+module Hakyll.Shortcode.Render (
+  Scheme(..),
+  buildURL,
 
-import Hakyll.Shortcode.YesNo
+  queryValid,
+  queryOneOf,
+  queryYesNo,
 
-class Render t where
-  render :: t -> String
+  pathValid,
+  
+  attrValid
+) where
 
-renderMaybe :: (Render t) => Maybe t -> String
-renderMaybe Nothing  = ""
-renderMaybe (Just x) = render x
+import Data.List (intercalate)
+import Network.URI
+import qualified Text.Blaze.Html5 as H
+import Text.Blaze.Renderer.String ()
+import Data.Monoid
 
-renderKeyValMaybe :: (Render t) => String -> Maybe t -> String
-renderKeyValMaybe _   Nothing  = ""
-renderKeyValMaybe key (Just x) = key ++ "='" ++ render x ++ "'"
+import Hakyll.Shortcode.Types.YesNo
 
-ifYesNo :: Maybe YesNo -> String -> String -> String
-ifYesNo x yes no = case x of
+
+data Scheme
+  = HTTPS
+
+instance Show Scheme where
+  show HTTPS = "https"
+
+
+buildURL :: Scheme -> String -> [String] -> [String] -> [String] -> String
+buildURL scheme auth path query frag = uriToString show uri ""
+  where
+    uri = URI
+      { uriScheme = show scheme ++ ":"
+      , uriAuthority = Just $ URIAuth
+          { uriUserInfo = ""
+          , uriRegName  = auth
+          , uriPort     = ""
+          }
+      , uriPath     = buildPath path
+      , uriQuery    = buildQuery query
+      , uriFragment = ""
+      }
+
+
+{-------------------}
+{- Query Fragments -}
+{-------------------}
+
+sanitizeQuery :: String -> String
+sanitizeQuery = escapeURIString encode
+  where
+    encode c = not $ (isReserved c) && (c /= '=')
+
+buildQuery :: [String] -> String
+buildQuery ps =
+  let
+    qs = intercalate "&"
+           $ filter (/= "")
+           $ map sanitizeQuery
+           $ ps
+  in
+    if null qs
+      then ""
+      else '?' : qs
+
+
+queryOneOf :: (Show t) => Maybe t -> String
+queryOneOf Nothing  = ""
+queryOneOf (Just x) = show x
+
+queryValid :: (Show t) => Maybe t -> String -> String
+queryValid Nothing  _   = ""
+queryValid (Just x) key = key ++ "=" ++ show x
+
+queryYesNo :: Maybe YesNo -> String -> String -> String
+queryYesNo x yes no = case x of
   Nothing  -> ""
   Just Yes -> yes
   Just No  -> no
+
+
+{------------------}
+{- Path Fragments -}
+{------------------}
+
+sanitizePath :: String -> String
+sanitizePath = escapeURIString encode
+  where
+    encode c = not $ isReserved c
+
+buildPath :: [String] -> String
+buildPath = concatMap ('/':) . filter (/= "") . map sanitizePath
+
+pathValid :: (Show t) => Maybe t -> String
+pathValid Nothing  = ""
+pathValid (Just x) = show x
+
+
+{--------------}
+{- Attributes -}
+{--------------}
+
+attrValid :: (Monoid a, Show b) => (H.AttributeValue -> a) -> Maybe b -> a
+attrValid key Nothing  = mempty
+attrValid key (Just x) = key $ H.stringValue $ show x
+

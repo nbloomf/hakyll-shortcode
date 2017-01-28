@@ -1,9 +1,4 @@
 * account for escaped ] in shortcode regex
 * haddock
 * tests
-* type safe Strings in YouTubeEmbed, use smart constructor
-* change 'class' to 'container-class'
-* make default container class 'youtube-container'
 * finish YouTube parameters
-* use blaze-html to construct embedcodes
-* use Data.URLEncoded to construct safe URLs
