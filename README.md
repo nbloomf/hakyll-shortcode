@@ -18,14 +18,17 @@ We do our best to validate input and sanitize the rendered HTML. But this librar
 
 See the [API docs](https://developers.google.com/youtube/player_parameters).
 
-| Key              | Values (Default)      | Description
-| ---------------- | --------------------- | -----------
-| ``id``           |                       | (Required.) The id of the video to be embedded.
-| ``class``        | ``youtube-container`` | Class of the ``div`` wrapping an ``iframe``; for CSS.
-| ``height``       |                       | Height of the ``iframe``.
-| ``width``        |                       | Width of the ``iframe``.
-| ``autoplay``     | ``yes``, ``no``       | If yes, automatically start after loading.
-| ``start``        | A counting number     | Start time, in seconds, from the beginning.
-| ``end``          | A counting number     | 
-| ``captions``     | ``show``, ``default`` | Show closed captions automatically, or defer to client.
-| ``show-related`` | ``yes``, (``no``)     | If yes, show related videos at the end.
+| Key                  | Values (Default)      | Description
+| ----------------     | --------------------- | -----------
+| ``id``               |                       | (Required.) The id of the video to be embedded.
+| ``class``            | ``youtube-container`` | Class of the ``div`` wrapping an ``iframe``; for CSS.
+| ``height``           |                       | Height of the ``iframe``.
+| ``width``            |                       | Width of the ``iframe``.
+| ``autoplay``         | ``yes``, (``no``)     | If yes, automatically start after loading.
+| ``start``            | A counting number     | Start time, in seconds, from the beginning.
+| ``end``              | A counting number     | 
+| ``captions``         | ``show``, ``default`` | Show closed captions automatically, or defer to client.
+| ``show-related``     | ``yes``, (``no``)     | If yes, show related videos at the end.
+| ``loop``             | ``yes``, (``no``)     | If yes, loop the video or playlist
+| ``disable-keyboard`` | ``yes``, (``no``)     | If yes, disable keyboard shortcuts for video controls
+| ``show-fullscreen``  | (``yes``), ``no``     | If no, do not enable the fullscreen button
