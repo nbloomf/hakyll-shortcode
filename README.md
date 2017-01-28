@@ -8,7 +8,7 @@ Shortcodes are strings of the form
 
 ``[tag attr1='val1' attr2='val2' ... attrN='valN']``
 
-that you sprinkle throughout your markdown which get expanded at compile time, typically into an ``iframe``. They provide a nice user interface on top of fiddly embed APIs.
+that you sprinkle throughout your markdown (between two blank lines) and which get expanded at compile time. Shortcodes can expand into anything, but mostly they're used to embed stuff in web pages.
 
 ## Usage
 
