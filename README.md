@@ -2,11 +2,15 @@
 
 This module aims to approximate the functionality of WordPress shortcodes for [Hakyll](https://jaspervdj.be/hakyll/) sites.
 
+## short-what?
+
 Shortcodes are strings of the form
 
 ``[tag attr1='val1' attr2='val2' ... attrN='valN']``
 
-which get expanded at compile time, typically into an ``iframe``. They provide a nice user interface on top of fiddly embed APIs.
+that you sprinkle throughout your markdown which get expanded at compile time, typically into an ``iframe``. They provide a nice user interface on top of fiddly embed APIs.
+
+## Usage
 
 The module exports two functions:
 
