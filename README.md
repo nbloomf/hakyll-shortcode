@@ -8,7 +8,7 @@ Shortcodes are strings of the form
 
 which get expanded at compile time, typically into an ``iframe``. Attributes can be in any order. Values must be quoted with ``'``, ``"``, ``‘’``, or ``“”`` and nested quotes can be escaped with ``\``. Constraints on values are encoded as types to guard against XSS.
 
-The module exports a function ``expandBLAHShortcodes`` for each shortcode type, which (surprise!) expands shortcodes with tag ``BLAH``, as well as ``expandAllShortcodes``, which expands all implemented shortcodes.
+The module exports a function ``expandShortcodes`` with signature ``ShortcodeService -> String -> String``. Acceptable values for ``ShortcodeService`` are ``YouTube`` and ``GeoGebra``, with more to come. We also provide ``expandAllShortcodes``, which expands all implemented shortcodes.
 
 We do our best to validate input and sanitize the rendered HTML. But this library is not well tested yet, so be very very careful before using this with untrusted input.
 
@@ -42,3 +42,8 @@ See the [API docs](https://developers.google.com/youtube/player_parameters).
 | ``show-controls``    | ``never``, ``onload``, ``onplay`` |
 | ``color``            | ``red``, ``white``    |
 | ``list-type``        | ``playlist``, ``search``, ``user-uploads`` |
+
+
+## ``geogebra``
+
+
