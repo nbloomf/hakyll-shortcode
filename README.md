@@ -1,16 +1,19 @@
 # hakyll-shortcode
 
-This module aims to approximate the functionality of WordPress shortcodes. It's intended to be used with the Hakyll static site generator, but this is not required.
+This module aims to approximate the functionality of WordPress shortcodes for [Hakyll](https://jaspervdj.be/hakyll/) sites.
 
 Shortcodes are strings of the form
 
 ``[tag attr1='val1' attr2='val2' ... attrN='valN']``
 
-which get expanded at compile time, typically into an ``iframe``. Attributes can be in any order. Values must be quoted with ``'``, ``"``, ``‘’``, or ``“”`` and nested quotes can be escaped with ``\``. Constraints on values are encoded as types to guard against XSS.
+which get expanded at compile time, typically into an ``iframe``. They provide a nice user interface on top of fiddly embed APIs.
 
-The module exports a function ``expandShortcodes`` with signature ``ShortcodeService -> String -> String``. Acceptable values for ``ShortcodeService`` are ``YouTube`` and ``GeoGebra``, with more to come. We also provide ``expandAllShortcodes``, which expands all implemented shortcodes.
+The module exports two functions:
 
-We do our best to validate input and sanitize the rendered HTML. But this library is not well tested yet, so be very very careful before using this with untrusted input.
+* ``expandShortcodes`` with signature ``ShortcodeService -> String -> String``. Acceptable values for ``ShortcodeService`` are ``YouTube`` and ``GeoGebra``, with more to come.
+* ``expandAllShortcodes``, which expands all implemented shortcodes.
+
+We try really hard to validate input and sanitize the rendered HTML. But this library is not well tested yet, so be very very careful before using this with untrusted input.
 
 # The Shortcodes
 
