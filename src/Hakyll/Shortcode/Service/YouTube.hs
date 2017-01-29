@@ -40,7 +40,7 @@ data YouTubeEmbed = YouTubeEmbed
   , yt_end        :: Maybe Natural_Number_Base_10
   , yt_start      :: Maybe Natural_Number_Base_10
   , yt_language   :: Maybe Iso_639_1_Language_Code
-  , yt_playlist   :: Maybe (CommaSep Letters_Numbers_Hyphens_Underscores)
+  , yt_playlist   :: Maybe RFC_3986_Unreserved_Uri_Characters
   , yt_origin     :: Maybe Domain_With_Scheme
 
   -- Yes/No Properties
