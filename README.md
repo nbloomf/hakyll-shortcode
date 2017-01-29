@@ -8,16 +8,34 @@ Shortcodes are strings of the form
 
 ``[tag attr1='val1' attr2='val2' ... attrN='valN']``
 
-that you sprinkle throughout your markdown (between two blank lines) and which get expanded at compile time. Shortcodes can expand into anything, but mostly they're used to embed stuff in web pages.
+that you sprinkle throughout your markdown (between two blank lines) and which get expanded at compile time. Shortcodes can expand into anything, but mostly they're used to embed stuff in web pages, like youtube videos.
 
 ## Usage
 
-The module exports two functions:
+If you're using Hakyll, after installing this package add the line
 
-* ``expandShortcodes`` with signature ``ShortcodeService -> String -> String``. Acceptable values for ``ShortcodeService`` are ``YouTube`` and ``GeoGebra``, with more to come.
-* ``expandAllShortcodes``, which expands all implemented shortcodes.
+```haskell
+import Hakyll.Shortcode
+```
 
-We try really hard to validate input and sanitize the rendered HTML. But this library is not well tested yet, so be very very careful before using this with untrusted input.
+to your list of module imports. Then, in any compiler where you want shortcodes expanded, add a ``>>= applyShortcodes allServices``. For example, here's a compiler for my web page.
+
+```haskell
+matchClasses :: Rules ()
+matchClasses = match "classes/**" $ do
+  route $ setExtension "html"
+  compile $ pandocMathCompiler
+    >>= applyShortcodes allServices -- woo! shortcodes!
+    >>= loadAndApplyTemplate
+          "templates/default.html" postCtx
+    >>= relativizeUrls
+```
+
+That ``allServices`` token has type ``[ShortcodeService]``, and it specifies which shortcodes we want expanded. (In this case, all of them.) But you can define your own list here; see the ``Hakyll.Shortcodes`` module for a list of services.
+
+## Disclaimer
+
+We try *really* hard to validate input and sanitize the rendered HTML. But this library is not well tested yet (working on it!), so be careful before using this with untrusted input.
 
 # The Shortcodes
 
