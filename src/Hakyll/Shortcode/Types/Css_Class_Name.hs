@@ -1,3 +1,10 @@
+{-|
+Copyright   : (c) Nathan Bloomfield, 2017
+License     : GPL-3
+Maintainer  : nbloomf@gmail.com
+Stability   : experimental
+-}
+
 module Hakyll.Shortcode.Types.Css_Class_Name (
   Css_Class_Name()
 ) where
@@ -12,6 +19,9 @@ import Hakyll.Shortcode.Validate
 {- CSS Class Names -}
 {-------------------}
 
+-- | Valid CSS class names: alphanumeric, hyphen, or underscore, but the first character must be alphanumeric.
+-- Note: this type represents only a subset of all valid class names.
+-- See the <https://www.w3.org/TR/CSS21/grammar.html#scanner CSS grammar>.
 newtype Css_Class_Name
   = Make { unMake :: String } deriving Eq
 

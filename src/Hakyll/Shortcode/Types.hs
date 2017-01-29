@@ -1,3 +1,12 @@
+{-|
+Copyright   : (c) Nathan Bloomfield, 2017
+License     : GPL-3
+Maintainer  : nbloomf@gmail.com
+Stability   : experimental
+
+The types reexported by this module (except for 'YesNo', which is a renaming of 'Bool') are safe strings. Each is an instance of the 'Validate' class, and may only be constructed using the 'validate' function. This ensures that the elements of a safe string type satisfy the constraints given in their 'Validate' instance.
+-}
+
 module Hakyll.Shortcode.Types (
   module Hakyll.Shortcode.Validate,
 

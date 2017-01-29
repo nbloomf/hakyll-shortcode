@@ -1,3 +1,10 @@
+{-|
+Copyright   : (c) Nathan Bloomfield, 2017
+License     : GPL-3
+Maintainer  : nbloomf@gmail.com
+Stability   : experimental
+-}
+
 module Hakyll.Shortcode.Types.Letters_Numbers_Hyphens_Underscores (
   Letters_Numbers_Hyphens_Underscores()
 ) where
@@ -8,10 +15,7 @@ import Text.Regex.Posix ((=~))
 import Hakyll.Shortcode.Validate
 
 
-{--------------------------------------}
-{- Alphanumeric, Hyphens, Underscores -}
-{--------------------------------------}
-
+-- | Strings consisting only of a-z, A-Z, 0-9, -, and _.
 newtype Letters_Numbers_Hyphens_Underscores
   = Make { unMake :: String } deriving Eq
 

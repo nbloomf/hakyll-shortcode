@@ -1,14 +1,19 @@
+{-|
+Copyright  : (c) Nathan Bloomfield, 2017
+License    : GPL-3
+Maintainer : nbloomf@gmail.com
+Stability  : experimental
+-}
+
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE GADTs #-}
 
 module Hakyll.Shortcode.Service (
-  Shortcode,
-  tag, attributes, emptycode, embedcode,
+  Shortcode(..),
   ShortcodeTag(ShortcodeTag),
   ShortcodeAttribute(YesNo, OneOf, Valid),
   expandShortcodes,
-  missingError,
-  YesNo(..)
+  missingError
 ) where
 
 import Hakyll.Shortcode.Validate
@@ -27,30 +32,36 @@ import Text.Regex.Posix
 {- The Shortcode Class -}
 {-----------------------}
 
+-- | Class representing abstract shortcode types.
 class Shortcode t where
-  -- The tag for our shortcode
+  -- | The tag for our shortcode.
   tag :: ShortcodeTag t
 
-  -- The allowed keys for our shortcode
+  -- | The allowed keys for our shortcode.
   attributes :: [ShortcodeAttribute t]
 
-  -- An empty shortcode instance
+  -- | An empty shortcode instance.
   emptycode :: t
 
-  -- Convert t to HTML
+  -- | Convert t to HTML.
   embedcode :: t -> String
 
 
+-- | Type representing the tag of a shortcode; such as @youtube@.
 data ShortcodeTag a = ShortcodeTag
   { unTag :: String
   } deriving Show
 
 
+-- | Type representing the allowed attributes of a shortcode.
+-- These come in three forms: Yes\/No attributes, which are present or not;
+-- Enumerated attributes, which take on one of a given list of values;
+-- and Validated attributes, whose values are strings of a given form.
 data ShortcodeAttribute t where
   -- The key string and a mutator.
   YesNo :: String -> (YesNo -> t -> t) -> ShortcodeAttribute t
 
-  -- The key string and a list of value/mutator pairs.
+  -- The key string and a list of value-mutator pairs.
   OneOf :: String -> [(String, t -> t)] -> ShortcodeAttribute t
 
   -- The key string and a mutator taking a Validate type.
@@ -103,6 +114,9 @@ update x kv = foldM (processKeyVal kv) x attributes
 {- Expanding Shortcodes -}
 {------------------------}
 
+-- | Generic shortcode expansion. This function almost certainly
+-- should not be called directly unless you are implementing a new
+-- shortcode.
 expandShortcodes :: (Shortcode t) => t -> String -> String
 expandShortcodes x text = foldr (expandOne x) text matches
   where
@@ -158,6 +172,8 @@ parseError tag err = concat
   , err ++ ".)"
   ]
 
+-- | Helper function for reporting errors; this one in case we are trying
+-- to expand a shortcode with a missing key value.
 missingError :: String -> String -> String
 missingError tag key = concat
   [ "(Nb. there is an error in this '" ++ tag ++ "' shortcode; "

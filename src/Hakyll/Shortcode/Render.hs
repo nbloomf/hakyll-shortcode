@@ -1,3 +1,12 @@
+{-|
+Copyright  : (c) Nathan Bloomfield, 2017
+License    : GPL-3
+Maintainer : nbloomf@gmail.com
+Stability  : experimental
+
+Helper functions for constructing URLs and HTML fragments.
+-}
+
 module Hakyll.Shortcode.Render (
   Scheme(..),
   buildURL,
@@ -23,6 +32,7 @@ import Data.Monoid
 import Hakyll.Shortcode.Types.YesNo
 
 
+-- | Simple sum type representing URL schemes.
 data Scheme
   = HTTPS
 
@@ -30,7 +40,14 @@ instance Show Scheme where
   show HTTPS = "https"
 
 
-buildURL :: Scheme -> String -> [String] -> [String] -> [String] -> String
+-- | Helper function for safely building URLs.
+buildURL
+  :: Scheme   -- ^ The scheme
+  -> String   -- ^ The domain (not including ://)
+  -> [String] -- ^ List of path components, to be separated by /.
+  -> [String] -- ^ List of query components, to be separated by &.
+  -> [String] -- ^ List of fragment components.
+  -> String
 buildURL scheme auth path query frag = uriToString show uri ""
   where
     uri = URI
@@ -68,15 +85,27 @@ buildQuery ps =
       else '?' : qs
 
 
-queryOneOf :: (Show t) => Maybe t -> String
+-- | Helper function for rendering @Maybe@ 'OneOf' shortcode parameters as query parameters.
+queryOneOf :: (Show t)
+  => Maybe t -- ^ The 'OneOf' parameter.
+  -> String
 queryOneOf Nothing  = ""
 queryOneOf (Just x) = show x
 
-queryValid :: (Show t) => Maybe t -> String -> String
+-- | Helper function for rendering @Maybe@ 'Valid' shortcode parameters as query parameters.
+queryValid :: (Show t)
+  => Maybe t -- ^ The 'Valid' parameter.
+  -> String  -- ^ The parameter key.
+  -> String
 queryValid Nothing  _   = ""
 queryValid (Just x) key = key ++ "=" ++ show x
 
-queryYesNo :: Maybe YesNo -> String -> String -> String
+-- | Helper function for rendering @Maybe@ 'YesNo' shortcode parameters as query parameters.
+queryYesNo
+  :: Maybe YesNo -- ^ The 'YesNo' parameter.
+  -> String      -- ^ Parameter for the 'Yes' case.
+  -> String      -- ^ Parameter for the 'No' case.
+  -> String
 queryYesNo x yes no = case x of
   Nothing  -> ""
   Just Yes -> yes
@@ -95,21 +124,37 @@ sanitizePath = escapeURIString encode
 buildPath :: [String] -> String
 buildPath = concatMap ('/':) . filter (/= "") . map sanitizePath
 
+-- | Helper function for rendering @Maybe@ 'Valid' parameters as path components.
 pathValid :: (Show t) => Maybe t -> String
 pathValid Nothing  = ""
 pathValid (Just x) = show x
 
-pathValidPre :: (Show t) => String -> Maybe t -> [String]
+-- | Helper function for rendering @Maybe@ 'Valid' parameters as path components, with a prefix.
+pathValidPre :: (Show t)
+  => String  -- ^ The prefix path.
+  -> Maybe t -- ^ The 'Valid' parameter.
+  -> [String]
 pathValidPre _ Nothing  = []
 pathValidPre p (Just x) = [p, show x]
 
-pathYesNo :: Maybe YesNo -> String -> String -> String
+-- | Helper function for rendering @Maybe@ 'YesNo' parameters as path components.
+pathYesNo
+  :: Maybe YesNo -- ^ The 'YesNo' parameter.
+  -> String      -- ^ Path for the 'Yes' case.
+  -> String      -- ^ Path for the 'No' case.
+  -> String
 pathYesNo x yes no = case x of
   Nothing  -> ""
   Just Yes -> yes
   Just No  -> no
 
-pathYesNoPre :: String -> Maybe YesNo -> String -> String -> [String]
+-- | Helper function for rendering @Maybe@ 'YesNo' parameters as path components, with a prefix.
+pathYesNoPre
+  :: String      -- ^ The prefix path.
+  -> Maybe YesNo -- ^ The 'YesNo' parameter.
+  -> String      -- ^ Path for the 'Yes' case.
+  -> String      -- ^ Path for the 'No' case.
+  -> [String]
 pathYesNoPre p x yes no = case x of
   Nothing  -> []
   Just Yes -> [p,yes]
@@ -120,6 +165,7 @@ pathYesNoPre p x yes no = case x of
 {- Attributes -}
 {--------------}
 
+-- | Helper function for optionally rendering a @Maybe@ as an HTML attribute.
 attrValid :: (Monoid a, Show b) => (H.AttributeValue -> a) -> Maybe b -> a
 attrValid key Nothing  = mempty
 attrValid key (Just x) = key $ H.stringValue $ show x

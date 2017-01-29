@@ -1,3 +1,10 @@
+{-|
+Copyright   : (c) Nathan Bloomfield, 2017
+License     : GPL-3
+Maintainer  : nbloomf@gmail.com
+Stability   : experimental
+-}
+
 module Hakyll.Shortcode.Parser (
   shortcodeParser
 ) where
@@ -9,6 +16,7 @@ import Text.ParserCombinators.Parsec
 {- Parsing Shortcodes -}
 {----------------------}
 
+-- | Given a tag, parses strings of the form @<p>[tag key1='val1' ... keyN='valN']</p>@ into lists of @(keyI,valI)@ pairs.
 shortcodeParser :: String -> Parser [(String, String)]
 shortcodeParser tag = do
   string "<p>["

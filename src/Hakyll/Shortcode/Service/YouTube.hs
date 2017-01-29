@@ -1,3 +1,10 @@
+{-|
+Copyright   : (c) Nathan Bloomfield, 2017
+License     : GPL-3
+Maintainer  : nbloomf@gmail.com
+Stability   : experimental
+-}
+
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 
@@ -22,6 +29,8 @@ import Text.Blaze.Html.Renderer.String (renderHtml)
 {- Types -}
 {---------}
 
+-- | A type representing embedded YouTube videos and playlists.
+-- See the <https://developers.google.com/youtube/player_parameters API documentation>.
 data YouTubeEmbed = YouTubeEmbed
   -- String Properties
   { yt_id         :: Maybe Letters_Numbers_Hyphens_Underscores
@@ -109,6 +118,7 @@ instance Show ListType where
 {- Shortcode Instance -}
 {----------------------}
 
+-- | Find and replace @youtube@ shortcodes.
 expandYouTubeShortcodes :: String -> String
 expandYouTubeShortcodes =
   expandShortcodes (emptycode :: YouTubeEmbed)

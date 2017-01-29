@@ -1,3 +1,10 @@
+{-|
+Copyright   : (c) Nathan Bloomfield, 2017
+License     : GPL-3
+Maintainer  : nbloomf@gmail.com
+Stability   : experimental
+-}
+
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 
@@ -38,12 +45,13 @@ data GeoGebraEmbed = GeoGebraEmbed
   } deriving Show
 
 
+-- | Find and replace @geogebra@ shortcodes.
 expandGeoGebraShortcodes :: String -> String
 expandGeoGebraShortcodes =
   expandShortcodes (emptycode :: GeoGebraEmbed)
 
 
--- Constructs the embed URI of a GeoGebraEmbed.
+-- | Constructs the embed URI of a GeoGebraEmbed.
 embedUri :: GeoGebraEmbed -> H.AttributeValue
 embedUri GeoGebraEmbed{..} = H.stringValue
   $ buildURL HTTPS "www.geogebra.org" path [] []

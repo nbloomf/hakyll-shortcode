@@ -1,3 +1,10 @@
+{-|
+Copyright   : (c) Nathan Bloomfield, 2017
+License     : GPL-3
+Maintainer  : nbloomf@gmail.com
+Stability   : experimental
+-}
+
 module Hakyll.Shortcode.Types.Natural_Number_Base_10 (
   Natural_Number_Base_10()
 ) where
@@ -8,6 +15,7 @@ import Text.Regex.Posix ((=~))
 import Hakyll.Shortcode.Validate
 
 
+-- | Either 0, or a nonempty string of decimal digits with no leading zeros.
 newtype Natural_Number_Base_10
   = Make { unMake :: String } deriving Eq
 

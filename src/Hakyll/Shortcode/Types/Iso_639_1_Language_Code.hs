@@ -1,16 +1,26 @@
+{-|
+Copyright   : (c) Nathan Bloomfield, 2017
+License     : GPL-3
+Maintainer  : nbloomf@gmail.com
+Stability   : experimental
+-}
+
 module Hakyll.Shortcode.Types.Iso_639_1_Language_Code (
   Iso_639_1_Language_Code()
 ) where
 
 import Hakyll.Shortcode.Validate
 
+-- | ISO 639.1 two-letter language codes.
+-- See <http://www.loc.gov/standards/iso639-2/php/code_list.php>.
+-- Must be constructed with 'validate'.
 newtype Iso_639_1_Language_Code
   = Make { unMake :: String } deriving Eq
 
 instance Validate Iso_639_1_Language_Code where
   validate text = if elem text codes
     then Right $ Make text
-    else Left "Must be an ISO639.1 two-letter language code."
+    else Left "Must be an ISO 639.1 two-letter language code."
     where
       codes =
         [ "ab", "aa", "af", "ak", "sq", "am", "ar", "an", "hy", "as"
