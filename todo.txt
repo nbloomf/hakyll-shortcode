@@ -1,3 +1,4 @@
 * account for escaped ] in shortcode regex
 * tests
 * finish "origin" and "list" YouTube parameters
+* fix issues shown by 'cabal check'

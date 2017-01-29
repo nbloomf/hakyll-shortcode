@@ -1,8 +1,11 @@
 Name:           hakyll-shortcode
+Description:    WordPress-style shortcodes for the Hakyll static site generator.
 Version:        0.0.1
-Cabal-Version:  >= 1.2
+Cabal-Version:  >= 1.10
 License:        GPL-3
+License-File:   LICENSE
 Author:         Nathan Bloomfield
+Maintainer:     Nathan Bloomfield
 Synopsis:       A shortcode extension module for Hakyll
 Stability:      Experimental
 Build-Type:     Simple
