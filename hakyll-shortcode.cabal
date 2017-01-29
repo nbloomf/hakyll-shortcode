@@ -34,6 +34,7 @@ Library
     Hakyll.Shortcode.Types.Letters_Numbers,
     Hakyll.Shortcode.Types.Letters_Numbers_Hyphens_Underscores,
     Hakyll.Shortcode.Types.Natural_Number_Base_10,
+    Hakyll.Shortcode.Types.RFC_3986_Unreserved_Uri_Characters,
     Hakyll.Shortcode.Types.YesNo
   build-depends:
     base >= 4.0 && < 5.0,
