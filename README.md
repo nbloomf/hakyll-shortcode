@@ -39,7 +39,9 @@ Then in your markdown say something like
 [youtube id='dQw4w9WgXcQ']
 ```
 
-Note that the shortcode must be on its own line, and must be between two blank lines. Otherwise it won't work!
+And this will expand into a proper ``iframe``, wrapped in a ``div`` of class ``youtube-container`` so you can style it with CSS.
+
+Note that each shortcode must be on its own line, and must be between two blank lines. Otherwise it won't work!
 
 ## Disclaimer
 
