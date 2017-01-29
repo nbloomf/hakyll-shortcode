@@ -8,7 +8,7 @@ Shortcodes are strings of the form
 
 ``[tag attr1='val1' attr2='val2' ... attrN='valN']``
 
-that you sprinkle throughout your markdown (between two blank lines) and which get expanded at compile time. Shortcodes can expand into anything, but mostly they're used to embed stuff in web pages, like youtube videos.
+that you sprinkle throughout your markdown (between two blank lines) and which get "expanded" at compile time. What "expanded" means depends on the type of shortcode, that is, the ``tag``. Shortcodes can expand into anything, but mostly they're used to embed stuff like youtube videos into web pages.
 
 ## Usage
 
@@ -32,6 +32,14 @@ matchClasses = match "classes/**" $ do
 ```
 
 That ``allServices`` token has type ``[ShortcodeService]``, and it specifies which shortcodes we want expanded. (In this case, all of them.) But you can define your own list here; see the ``Hakyll.Shortcodes`` module for a list of services.
+
+Then in your markdown say something like
+
+```
+[youtube id='dQw4w9WgXcQ']
+```
+
+Note that the shortcode must be on its own line, and must be between two blank lines. Otherwise it won't work!
 
 ## Disclaimer
 
