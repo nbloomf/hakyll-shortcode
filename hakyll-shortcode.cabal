@@ -5,12 +5,15 @@ Cabal-Version:  >= 1.10
 License:        GPL-3
 License-File:   LICENSE
 Author:         Nathan Bloomfield
-Maintainer:     Nathan Bloomfield
+Maintainer:     nbloomf@gmail.com
 Synopsis:       A shortcode extension module for Hakyll
 Stability:      Experimental
 Build-Type:     Simple
+Category:       Web
 
 Library
+  default-language:
+    Haskell2010
   hs-source-dirs:
     src/
   exposed-modules:
@@ -33,16 +36,18 @@ Library
     Hakyll.Shortcode.Types.Natural_Number_Base_10,
     Hakyll.Shortcode.Types.YesNo
   build-depends:
-    base,
+    base >= 4.0 && < 5.0,
     regex-posix,
-    MissingH,
-    blaze-html,
-    blaze-markup,
-    parsec,
-    network-uri,
-    split
+    MissingH >= 1.3.0.1 && < 2.0,
+    blaze-html >= 0.8.1.0 && < 1.0,
+    blaze-markup >= 0.7.0.2,
+    parsec >= 3.1.9 && < 4.0,
+    network-uri >= 2.6.0.3 && < 3.0,
+    split >= 0.2.2 && < 1.0
 
 Test-Suite hakyll-shortcode-test-suite
+  default-language:
+    Haskell2010
   type:
     exitcode-stdio-1.0
   main-is:
@@ -54,7 +59,13 @@ Test-Suite hakyll-shortcode-test-suite
     -main-is Tests.Main
     -fforce-recomp
   build-depends:
-    base,
-    QuickCheck,
-    tasty,
-    tasty-quickcheck
+    base >= 4.0 && < 5.0,
+    QuickCheck >= 2.6 && < 3.0,
+    tasty >= 0.10.1.2 && < 1.0,
+    tasty-quickcheck >= 0.8.3.2 && < 1.0
+
+source-repository head
+  type:
+    git
+  location:
+    https://github.com/nbloomf/hakyll-shortcode
