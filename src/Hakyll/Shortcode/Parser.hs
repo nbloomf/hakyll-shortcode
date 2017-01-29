@@ -43,7 +43,7 @@ quotedString = foldl1 (<|>)
       t <- many $ choice
              [ try $ noneOf [ close, '\\', '\n', ']' ]
              , try $ string ['\\',close] >> return close
-             , try $ string "\\"         >> return '\\'
+             , try $ string "\\\\"       >> return '\\'
              , try $ string "\\n"        >> return '\n'
              , try $ string "\\]"        >> return ']'
              ]
