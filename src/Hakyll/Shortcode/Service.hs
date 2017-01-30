@@ -6,7 +6,7 @@ Stability  : experimental
 -}
 
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs               #-}
 
 module Hakyll.Shortcode.Service (
   Shortcode(..),
