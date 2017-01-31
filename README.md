@@ -51,7 +51,7 @@ We try *really* hard to validate input and sanitize the rendered HTML. But this 
 
 ## ``youtube``
 
-See the [API docs](https://developers.google.com/youtube/player_parameters).
+See the [API docs](https://developers.google.com/youtube/player_parameters) for more info.
 
 | Key                  | Values (Default)      | Description
 | ----------------     | --------------------- | -----------
