@@ -16,12 +16,14 @@ module Hakyll.Shortcode (
 
 import Hakyll.Shortcode.Service.GeoGebra
 import Hakyll.Shortcode.Service.YouTube
+import Hakyll.Shortcode.Service.Example
 
 
 -- | A simple sum type representing the available shortcodes.
 data ShortcodeService
   = GeoGebra
   | YouTube
+  | Example
   deriving Eq
 
 
@@ -30,6 +32,7 @@ expandShortcodesFor :: ShortcodeService -> String -> String
 expandShortcodesFor x = case x of
   GeoGebra -> expandGeoGebraShortcodes
   YouTube  -> expandYouTubeShortcodes
+  Example  -> expandExampleShortcodes
 
 
 -- | Expand shortcodes of each of the provided types.

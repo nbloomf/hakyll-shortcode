@@ -69,7 +69,6 @@ data ShortcodeAttribute t where
 
 
 
-
 -- Update t with a keyval pair
 update :: (Shortcode t) => t -> (String, String) -> Either String t
 update x kv = foldM (processKeyVal kv) x attributes
