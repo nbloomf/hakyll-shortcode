@@ -20,7 +20,8 @@ Library
     Hakyll.Shortcode,
     Hakyll.Shortcode.Service,
     Hakyll.Shortcode.Types,
-    Hakyll.Shortcode.Render
+    Hakyll.Shortcode.Render,
+    Hakyll.Shortcode.Service.Example
   other-modules:
     Hakyll.Shortcode.Parser,
     Hakyll.Shortcode.Validate,

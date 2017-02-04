@@ -35,7 +35,8 @@ parsing, validation, and sanitization for you, giving you a function
 @String -> String@ that expands your new shortcode while making sure
 only input conforming to your type model is allowed.
 
-Now let's walk through a sample shortcode module.
+Now let's walk through a sample shortcode module. To read along,
+view the source of this module.
 -}
 
 
@@ -71,7 +72,7 @@ import Text.Blaze.Html.Renderer.String (renderHtml)
 
 -- For the sake of an example, I want my shortcode to look like this:
 --
---   [example valid='foo' list='bar' yesno='baz' oneof='qux']
+--   [example valid='foo' item='bar' yesno='baz' oneof='qux']
 --
 -- subject to the following constraints:
 --   1. foo should be a sequence of digits,
@@ -88,104 +89,69 @@ import Text.Blaze.Html.Renderer.String (renderHtml)
 -- | We can represent this information using the following type.
 -- Note that @Maybe@ means "zero or one" and @[]@ means "zero or more".
 data Example = Example
-  { ex_valid :: Maybe Decimal_Digits
+  { ex_valid :: Maybe Natural_Number_Base_10
   , ex_list  :: [Letters_Numbers]
   , ex_yesno :: Maybe YesNo
   , ex_oneof :: Maybe Beatle
   }
 
+-- | The 'Decimal_Digits', 'Letters_Numbers', and 'YesNo' types
+-- are provided by 'Hakyll.Shortcode.Types'. But the 'Beatle' type
+-- is custom, so we need to define it.
 data Beatle
   = John
   | Paul
   | George
   | Ringo
+  deriving Show
 
 
--- | Find and replace @example@ shortcodes.
-expandGeoGebraShortcodes :: String -> String
-expandGeoGebraShortcodes =
+-- | This is the function that finds and replaces @example@
+-- shortcodes. It is just a type-specific version of the
+-- 'expandShortcodes' function, that takes a shortcode specification
+-- and generates a find-and-replace function for it.
+expandExampleShortcodes :: String -> String
+expandExampleShortcodes =
   expandShortcodes (emptycode :: Example)
 
 
--- | Constructs the embed URI of a GeoGebraEmbed.
-embedUri :: GeoGebraEmbed -> H.AttributeValue
-embedUri GeoGebraEmbed{..} = H.stringValue
-  $ buildURL HTTPS "www.geogebra.org" path [] []
-  where
-    path = concat
-      [ ["material"]
-      , ["iframe"]
-      , pathValidPre "id"     gg_id
-      , pathValidPre "width"  gg_width
-      , pathValidPre "height" gg_height
-      , pathValidPre "border" gg_bordercolor
-      , pathYesNoPre "ai"     gg_inputbar    "true" "false"
-      , pathYesNoPre "asb"    gg_stylebar    "true" "false"
-      , pathYesNoPre "smb"    gg_menubar     "true" "false"
-      , pathYesNoPre "stb"    gg_toolbar     "true" "false"
-      , pathYesNoPre "stbh"   gg_toolbarhelp "true" "false"
-      , pathYesNoPre "sri"    gg_reseticon   "true" "false"
-      , pathYesNoPre "ctl"    gg_clicktoload "true" "false"
-      , pathYesNoPre "rc"     gg_rightclick  "true" "false"
-      , pathYesNoPre "ld"     gg_labeldrag   "true" "false"
-      , pathYesNoPre "sdz"    gg_panzoom     "true" "false"
-      ]
 
-
-instance Shortcode GeoGebraEmbed where
+instance Shortcode Example where
   tag = ShortcodeTag "example"
 
 
-  emptycode = GeoGebraEmbed
+  emptycode = Example
     -- String Properties
-    { gg_id          = Nothing
-    , gg_class       = validateMaybe "geogebra-container"
-    , gg_height      = Nothing
-    , gg_width       = Nothing
-    , gg_bordercolor = Nothing
-
-    -- Yes/No Properties
-    , gg_inputbar    = Nothing
-    , gg_stylebar    = Nothing
-    , gg_menubar     = Nothing
-    , gg_toolbar     = Nothing
-    , gg_toolbarhelp = Nothing
-    , gg_reseticon   = Nothing
-    , gg_clicktoload = Nothing
-    , gg_rightclick  = Nothing
-    , gg_labeldrag   = Nothing
-    , gg_panzoom     = Nothing
+    { ex_valid = Nothing
+    , ex_list  = []
+    , ex_yesno = Nothing
+    , ex_oneof = Nothing
     }
 
 
-  embedcode gg@GeoGebraEmbed{..} 
-    | gg_id /= Nothing = do
-        renderHtml $ do
-          H.div H.! (attrValid A.class_ gg_class) $ do
-            H.iframe H.! mconcat
-              [ attrValid A.height gg_height
-              , attrValid A.width gg_width
-              , A.src $ embedUri gg
-              ] $ mempty
+  -- | The 'embedcode' function renders a shortcode object as text;
+  -- typically HTML, but here we'll just use plain text for simplicity.
+  embedcode ex@Example{..} 
+    | ex_valid /= Nothing = unlines
+        [ "Here are the arguments of your example shortcode:"
+        , "  " ++ show ex_valid
+        , "  " ++ show ex_list
+        , "  " ++ show ex_yesno
+        , "  " ++ show ex_oneof
+        ]
 
-    | otherwise = missingError "geogebra" "id"
+    | otherwise = "Missing 'valid' key!"
 
 
   attributes =
-    -- String Properties
     [ Valid "valid" $ \x ex -> ex { ex_valid = Just x }
-    , Valid "item"  $ \x ex -> ex { ex_list  = Just x }
-
-    -- Yes/No Properties
-    , YesNo "show-input-bar"    $ \x gg -> gg { gg_inputbar    = Just x }
-    , YesNo "show-style-bar"    $ \x gg -> gg { gg_stylebar    = Just x }
-    , YesNo "show-menu-bar"     $ \x gg -> gg { gg_menubar     = Just x }
-    , YesNo "show-tool-bar"     $ \x gg -> gg { gg_toolbar     = Just x }
-    , YesNo "show-tool-help"    $ \x gg -> gg { gg_toolbarhelp = Just x }
-    , YesNo "show-reset-icon"   $ \x gg -> gg { gg_reseticon   = Just x }
-    , YesNo "click-to-load"     $ \x gg -> gg { gg_clicktoload = Just x }
-    , YesNo "allow-right-click" $ \x gg -> gg { gg_rightclick  = Just x }
-    , YesNo "drag-labels"       $ \x gg -> gg { gg_labeldrag   = Just x }
-    , YesNo "allow-pan-zoom"    $ \x gg -> gg { gg_panzoom     = Just x }
+    , Valid "item"  $ \x ex -> ex { ex_list  = x : ex_list ex }
+    , YesNo "yesno" $ \x ex -> ex { ex_yesno = Just x }
+    , OneOf "oneof"
+        [ ("john",   \ex -> ex { ex_oneof = Just John   })
+        , ("paul",   \ex -> ex { ex_oneof = Just Paul   })
+        , ("george", \ex -> ex { ex_oneof = Just George })
+        , ("ringo",  \ex -> ex { ex_oneof = Just Ringo  })
+        ]
     ]
 
