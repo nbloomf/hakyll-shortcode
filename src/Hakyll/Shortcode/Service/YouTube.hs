@@ -60,7 +60,7 @@ data YouTubeEmbed = YouTubeEmbed
   , yt_color      :: Maybe Color
   , yt_controls   :: Maybe ShowControls
   , yt_listtype   :: Maybe ListType
-  } deriving Show
+  }
 
 
 {- cc_load_policy -}
@@ -69,8 +69,8 @@ data CaptionPolicy
   = ShowCaptions
   deriving Eq
 
-instance Show CaptionPolicy where
-  show ShowCaptions = "cc_load_policy=1"
+instance QueryParameter CaptionPolicy where
+  renderQueryParameter ShowCaptions = "cc_load_policy=1"
 
 
 {- controls -}
@@ -81,10 +81,11 @@ data ShowControls
   | ShowControlsOnplay
   deriving Eq
 
-instance Show ShowControls where
-  show ShowControlsNever  = "controls=0"
-  show ShowControlsOnload = "controls=1"
-  show ShowControlsOnplay = "controls=2"
+instance QueryParameter ShowControls where
+  renderQueryParameter x = case x of
+    ShowControlsNever  -> "controls=0"
+    ShowControlsOnload -> "controls=1"
+    ShowControlsOnplay -> "controls=2"
 
 
 {- color -}
@@ -94,9 +95,10 @@ data Color
   | White
   deriving Eq
 
-instance Show Color where
-  show Red   = "color=red"
-  show White = "color=white"
+instance QueryParameter Color where
+  renderQueryParameter x = case x of
+    Red   -> "color=red"
+    White -> "color=white"
 
 
 {- listType -}
@@ -107,10 +109,11 @@ data ListType
   | ListTypeUserUploads
   deriving Eq
 
-instance Show ListType where
-  show ListTypePlaylist    = "listType=playlist"
-  show ListTypeSearch      = "listType=search"
-  show ListTypeUserUploads = "listType=user_uploads"
+instance QueryParameter ListType where
+  renderQueryParameter x = case x of
+    ListTypePlaylist    -> "listType=playlist"
+    ListTypeSearch      -> "listType=search"
+    ListTypeUserUploads -> "listType=user_uploads"
 
 
 

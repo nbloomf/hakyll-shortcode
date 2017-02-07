@@ -40,28 +40,29 @@ view the source of this module.
 -}
 
 
--- | A couple of language extensions will be useful.
+-- A couple of language extensions will be useful.
 -- The OverloadedStrings extension is used by Text.Blaze
 -- to minimize boilerplate. Similarly, RecordWildCards will
 -- make working with large records less verbose.
+
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 
 
--- | We only need to export one function: an alias for
+-- We only need to export one function: an alias for
 -- the 'expandShortcodes' function. More on this later.
 module Hakyll.Shortcode.Service.Example(
   expandExampleShortcodes
 ) where
 
 
--- | Now for some imports; these bring in the Shortcode API.
+-- Now for some imports; these bring in the Shortcode API.
 import Hakyll.Shortcode.Service -- Handles parsing and expanding shortcodes.
 import Hakyll.Shortcode.Render  -- Helper functions for rendering URLs and HTML.
 import Hakyll.Shortcode.Types   -- A library of validatable string-like types.
 
 
--- | These modules are not necessary for defining a shortcode.
+-- These modules are not necessary for defining a shortcode.
 -- However, we will use them to more easily construct sanitized HTML.
 import Data.Monoid
 import Network.URI

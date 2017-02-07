@@ -11,6 +11,7 @@ module Hakyll.Shortcode.Render (
   Scheme(..),
   buildURL,
 
+  QueryParameter(..),
   queryValid,
   queryOneOf,
   queryYesNo,
@@ -85,12 +86,16 @@ buildQuery ps =
       else '?' : qs
 
 
+class QueryParameter t where
+  renderQueryParameter :: t -> String
+
+
 -- | Helper function for rendering @Maybe@ 'OneOf' shortcode parameters as query parameters.
-queryOneOf :: (Show t)
+queryOneOf :: (QueryParameter t)
   => Maybe t -- ^ The 'OneOf' parameter.
   -> String
 queryOneOf Nothing  = ""
-queryOneOf (Just x) = show x
+queryOneOf (Just x) = renderQueryParameter x
 
 -- | Helper function for rendering @Maybe@ 'Valid' shortcode parameters as query parameters.
 queryValid :: (Show t)
