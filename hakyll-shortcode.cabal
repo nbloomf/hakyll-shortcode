@@ -1,6 +1,6 @@
 Name:           hakyll-shortcode
 Description:    WordPress-style shortcodes for the Hakyll static site generator.
-Version:        0.0.1
+Version:        0.0.2
 Cabal-Version:  >= 1.10
 License:        GPL-3
 License-File:   LICENSE
@@ -27,6 +27,7 @@ Library
     Hakyll.Shortcode.Validate,
     Hakyll.Shortcode.Service.YouTube,
     Hakyll.Shortcode.Service.GeoGebra,
+    Hakyll.Shortcode.Service.Gravatar,
     Hakyll.Shortcode.Types.CommaSep,
     Hakyll.Shortcode.Types.Css_Class_Name,
     Hakyll.Shortcode.Types.Domain_With_Scheme,
@@ -34,6 +35,7 @@ Library
     Hakyll.Shortcode.Types.Iso_639_1_Language_Code,
     Hakyll.Shortcode.Types.Letters_Numbers,
     Hakyll.Shortcode.Types.Letters_Numbers_Hyphens_Underscores,
+    Hakyll.Shortcode.Types.MD5_Digest,
     Hakyll.Shortcode.Types.Natural_Number_Base_10,
     Hakyll.Shortcode.Types.RFC_3986_Unreserved_Uri_Characters,
     Hakyll.Shortcode.Types.YesNo

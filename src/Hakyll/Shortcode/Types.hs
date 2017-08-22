@@ -16,6 +16,7 @@ module Hakyll.Shortcode.Types (
   module Hakyll.Shortcode.Types.Iso_639_1_Language_Code,
   module Hakyll.Shortcode.Types.Letters_Numbers,
   module Hakyll.Shortcode.Types.Letters_Numbers_Hyphens_Underscores,
+  module Hakyll.Shortcode.Types.MD5_Digest,
   module Hakyll.Shortcode.Types.Natural_Number_Base_10,
   module Hakyll.Shortcode.Types.RFC_3986_Unreserved_Uri_Characters,
   module Hakyll.Shortcode.Types.YesNo,
@@ -32,6 +33,7 @@ import Hakyll.Shortcode.Types.Hex_Color_Code
 import Hakyll.Shortcode.Types.Iso_639_1_Language_Code
 import Hakyll.Shortcode.Types.Letters_Numbers
 import Hakyll.Shortcode.Types.Letters_Numbers_Hyphens_Underscores
+import Hakyll.Shortcode.Types.MD5_Digest
 import Hakyll.Shortcode.Types.Natural_Number_Base_10
 import Hakyll.Shortcode.Types.RFC_3986_Unreserved_Uri_Characters
 import Hakyll.Shortcode.Types.YesNo

@@ -15,6 +15,7 @@ module Hakyll.Shortcode (
 ) where
 
 import Hakyll.Shortcode.Service.GeoGebra
+import Hakyll.Shortcode.Service.Gravatar
 import Hakyll.Shortcode.Service.YouTube
 import Hakyll.Shortcode.Service.Example
 
@@ -22,6 +23,7 @@ import Hakyll.Shortcode.Service.Example
 -- | A simple sum type representing the available shortcodes.
 data ShortcodeService
   = GeoGebra
+  | Gravatar
   | YouTube
   | Example
   deriving Eq
@@ -31,6 +33,7 @@ data ShortcodeService
 expandShortcodesFor :: ShortcodeService -> String -> String
 expandShortcodesFor x = case x of
   GeoGebra -> expandGeoGebraShortcodes
+  Gravatar -> expandGravatarShortcodes
   YouTube  -> expandYouTubeShortcodes
   Example  -> expandExampleShortcodes
 
@@ -51,5 +54,6 @@ applyShortcodes svc text =
 allServices :: [ShortcodeService]
 allServices =
   [ GeoGebra
+  , Gravatar
   , YouTube
   ]

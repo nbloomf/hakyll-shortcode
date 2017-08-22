@@ -117,8 +117,11 @@ instance Shortcode GeoGebraEmbed where
 
   attributes =
     -- String Properties
-    [ Valid "id"    $ \x gg -> gg { gg_id          = Just x }
-    , Valid "color" $ \x gg -> gg { gg_bordercolor = Just x }
+    [ Valid "id"     $ \x gg -> gg { gg_id          = Just x }
+    , Valid "class"  $ \x gg -> gg { gg_class       = Just x }
+    , Valid "color"  $ \x gg -> gg { gg_bordercolor = Just x }
+    , Valid "height" $ \x gg -> gg { gg_height      = Just x }
+    , Valid "width"  $ \x gg -> gg { gg_width       = Just x }
 
     -- Yes/No Properties
     , YesNo "show-input-bar"    $ \x gg -> gg { gg_inputbar    = Just x }
