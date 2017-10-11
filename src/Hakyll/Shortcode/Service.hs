@@ -119,6 +119,7 @@ update x kv = foldM (processKeyVal kv) x attributes
 expandShortcodes :: (Shortcode t) => t -> String -> String
 expandShortcodes x text = foldr (expandOne x) text matches
   where
+    matches :: [String]
     matches = getAllTextMatches $ text =~ (shortcodeRegex x)
 
     expandOne :: (Shortcode t) => t -> String -> String -> String
