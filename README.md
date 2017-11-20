@@ -101,11 +101,11 @@ See the [API docs](https://developers.google.com/youtube/player_parameters) for 
 
 ## ``gravatar``
 
-| Key                   | Values (Default)       | Description
-| ----                  | -----------------      | ------------
-| ``hash``              |                        |
-| ``class``             | ``gravatar-container`` | Class of the ``div`` wrapping an ``iframe``; for CSS.
-| ``size``              |                        |
-| ``default``           | ``404``,``mystery``,   |
-| ``force-default``     | ``yes``, ``no``        |
-| ``rating``            | ``yes``, ``no``        |
+| Key                   | Values (Default)            | Description
+| ----                  | -----------------           | ------------
+| ``hash``              |                             |
+| ``class``             | ``gravatar-container``      | Class of the ``div`` wrapping an ``iframe``; for CSS.
+| ``size``              |                             |
+| ``default``           | ``404``,``mystery``,        |
+| ``force-default``     | ``yes``, ``no``             |
+| ``rating``            | ``g``, ``pg``, ``r``, ``x`` |
